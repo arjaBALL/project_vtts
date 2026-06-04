@@ -44,7 +44,7 @@ export default function Sidebar() {
                     {navItems.map(({ section, items }) => (
                         <div key={section}>
                             <p
-                                className={`text-[10px] uppercase tracking-widest text-indigo-400 px-2 overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                                className={`text-[10px] uppercase tracking-widest text-indigo-400 font-semibold px-2 overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                                     collapsed
                                         ? "max-h-0 opacity-0 mb-0 pb-0"
                                         : "max-h-6 opacity-100 mb-1"
