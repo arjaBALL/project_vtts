@@ -61,9 +61,10 @@ export default function Drawer({
                     </div>
 
                     {/* Content */}
-                    <div className="p-4 overflow-y-auto flex-1 text-white">
+                    <div className="p-4 overflow-y-auto flex-1 text-white scrollbar-thin scrollbar-thumb-indigo-500/20 scrollbar-track-transparent scrollbar-thumb-rounded-full hover:scrollbar-thumb-indigo-500/40 scroll-smooth">
                         {children}
                     </div>
+
                     {footer && (
                         <div className="px-4 py-3 border-t border-white/10 bg-gray-800">
                             {footer}
