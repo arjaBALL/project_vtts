@@ -40,25 +40,28 @@ export const navItems = [
         ],
     },
     {
-        section: "Data Management",
+        section: "Administrator",
         items: [
             {
-                label: "Drivers",
-                icon: "userkey",
-                href: "/drivers",
-                badge: null,
-            },
-            {
-                label: "User",
-                icon: "userPlus",
-                href: "/users",
-                badge: null,
-            },
-            {
-                label: "Vehicles",
-                icon: "carFront",
-                href: "/vehicles",
-                badge: null,
+                label: "Data Management",
+                icon: "database",
+                children: [
+                    {
+                        label: "Drivers",
+                        icon: "userkey",
+                        href: "/drivers",
+                    },
+                    {
+                        label: "Users",
+                        icon: "userPlus",
+                        href: "/users",
+                    },
+                    {
+                        label: "Vehicles",
+                        icon: "carFront",
+                        href: "/vehicles",
+                    },
+                ],
             },
         ],
     },

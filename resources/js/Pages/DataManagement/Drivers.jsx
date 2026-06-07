@@ -1,26 +1,26 @@
-import AppLayout from "../Layouts/AppLayout"; // Go up one level, then into Layouts
-import Drawer from "../components/ui/Drawer";
+import AppLayout from "../../Layouts/AppLayout"; // Go up one level, then into Layouts
+import Drawer from "../../components/ui/Drawer";
 import { useState } from "react";
-import { UserPlus2 } from "lucide-react";
-import { TextInput, SelectInput } from "../components/ui/Inputs";
+import { UserRoundKey, Trash2Icon, PenLine } from "lucide-react";
+import { TextInput, SelectInput } from "../../components/ui/Inputs";
 
-export default function Users() {
+export default function Drivers() {
     const [open, setOpen] = useState(false);
     return (
         <AppLayout>
             <div className="p-6">
-                <h1 className="text-2xl font-bold">Users Page</h1>
+                <h1 className="text-2xl font-bold">Drivers Page</h1>
                 <p className="text-[12px] text-gray-300 mb-3">
-                    Users list and management interface will go here. You can
-                    add, edit, or remove users from this page.
+                    Drivers list and management interface will go here. You can
+                    add, edit, or remove drivers from this page.
                 </p>
                 <div className="mb-4">
                     <button
                         onClick={() => setOpen(true)}
                         className="flex items-center gap-2 px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition"
                     >
-                        <UserPlus2 size={18} />
-                        <span>New User</span>
+                        <UserRoundKey size={18} />
+                        <span>New Driver</span>
                     </button>
                 </div>
                 <div className="rounded-lg border border-gray-700 overflow-hidden">
@@ -34,7 +34,7 @@ export default function Users() {
                                     Office Assignment
                                 </th>
                                 <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-400">
-                                    Role
+                                    License Expiry
                                 </th>
                                 <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-400">
                                     Status
@@ -45,25 +45,27 @@ export default function Users() {
 
                         <tbody className="bg-gray-700 divide-y divide-gray-600">
                             <tr>
-                                <td className="px-6 py-4 text-sm text-white">
+                                <td className="px-6 py-3 text-sm text-white">
                                     Arjay
                                 </td>
-                                <td className="px-6 py-4 text-sm text-white">
+                                <td className="px-6 py-3 text-sm text-white">
                                     Main Office
                                 </td>
-                                <td className="px-6 py-4 text-sm text-white">
-                                    Acceptor
+                                <td className="px-6 py-3 text-sm text-white">
+                                    2025-12-31
                                 </td>
-                                <td className="px-6 py-4 text-sm text-green-400">
+                                <td className="px-6 py-3 text-sm text-green-400">
                                     Active
                                 </td>
-                                <td className="px-6 py-4 text-sm text-right">
+                                <td className="px-6 py-3 text-sm text-right">
                                     <div className="flex justify-end gap-2">
-                                        <button className="px-3 py-1 text-xs rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 transition">
+                                        <button className="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 transition">
+                                            <PenLine size={12} />
                                             Edit
                                         </button>
 
-                                        <button className="px-3 py-1 text-xs rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 transition">
+                                        <button className="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 transition">
+                                            <Trash2Icon size={12} />
                                             Delete
                                         </button>
                                     </div>

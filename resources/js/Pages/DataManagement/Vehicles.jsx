@@ -1,5 +1,5 @@
-import AppLayout from "../Layouts/AppLayout"; // Go up one level, then into Layouts
-import Drawer from "../components/ui/Drawer";
+import AppLayout from "../../Layouts/AppLayout"; // Go up one level, then into Layouts
+import Drawer from "../../components/ui/Drawer";
 import { useState } from "react";
 import {
     UserRoundKey,
@@ -9,7 +9,7 @@ import {
     FuelIcon,
     CogIcon,
 } from "lucide-react";
-import { TextInput, SelectInput } from "../components/ui/Inputs";
+import { TextInput, SelectInput } from "../../components/ui/Inputs";
 
 export default function Vehicles() {
     const [open, setOpen] = useState(false);
