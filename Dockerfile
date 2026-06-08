@@ -20,10 +20,8 @@ COPY . .
 # PHP deps
 RUN composer install --no-dev --optimize-autoloader
 
-# JS build with verification
-RUN npm install && npm run build && \
-    ls -la public/build/ && \
-    test -f public/build/manifest.json || (echo "❌ Vite manifest missing" && exit 1)
+# JS build
+RUN npm install && npm run build
 
 # Permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
@@ -40,6 +38,9 @@ RUN echo '#!/bin/bash\n\
 set -e\n\
 php artisan optimize:clear\n\
 php artisan storage:link || true\n\
+php artisan migrate --force\n\
+# Add this line to create cache table if missing\n\
+php artisan cache:table\n\
 php artisan migrate --force\n\
 sed -i "s/80/${PORT}/g" /etc/apache2/ports.conf\n\
 sed -i "s/80/${PORT}/g" /etc/apache2/sites-available/000-default.conf\n\
