@@ -2,34 +2,31 @@ FROM php:8.3-cli
 
 WORKDIR /var/www
 
-# Install system dependencies
+# System dependencies
 RUN apt-get update && apt-get install -y \
     git curl unzip zip libpng-dev libonig-dev libxml2-dev \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
+    nodejs npm \
     && docker-php-ext-install pdo pdo_mysql
 
-# Install Composer
+# Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy project files
+# App files
 COPY . .
 
-# Install PHP dependencies
+# PHP deps
 RUN composer install --no-dev --optimize-autoloader
 
-# Install JS dependencies and build
+# JS build
 RUN npm install && npm run build
-
-# Create SQLite database
-RUN touch database/database.sqlite
 
 # Permissions
 RUN chmod -R 775 storage bootstrap/cache
 
-# Cache config
-RUN php artisan config:cache && php artisan route:cache
-
 EXPOSE 10000
 
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
+# Runtime commands (IMPORTANT for Render)
+CMD php artisan optimize:clear && \
+    php artisan storage:link || true && \
+    php artisan migrate --force && \
+    php artisan serve --host=0.0.0.0 --port=10000
