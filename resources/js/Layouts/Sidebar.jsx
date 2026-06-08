@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronDown } from "lucide-react";
 import { navItems } from "../data/navItems";
 import NavIcon from "../components/ui/NavIcons";
 import { router } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 
 export default function Sidebar({ mobileOpen, onClose }) {
     const [collapsed, setCollapsed] = useState(false);
