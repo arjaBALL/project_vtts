@@ -2,16 +2,16 @@ FROM php:8.3-cli
 
 WORKDIR /var/www
 
-# Install system dependencies + Node.js 20
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git curl unzip zip libpng-dev libonig-dev libxml2-dev ca-certificates gnupg \
-    && mkdir -p /etc/apt/keyrings \
-    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
-       | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" \
-       > /etc/apt/sources.list.d/nodesource.list \
-    && apt-get update && apt-get install -y nodejs \
-    && docker-php-ext-install pdo pdo_mysql pdo_sqlite
+    && docker-php-ext-install pdo pdo_mysql pdo_sqlite \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 20 - Method 2 (NodeSource)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -26,14 +26,13 @@ RUN composer install --no-dev --optimize-autoloader
 RUN npm install && npm run build
 
 # Create SQLite database
-RUN touch database/database.sqlite
+RUN mkdir -p database && touch database/database.sqlite
 
 # Permissions
 RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE 10000
 
-# Config cache at runtime (env vars available here, not at build time)
 CMD php artisan config:cache && \
     php artisan route:cache && \
     php artisan migrate --force && \
