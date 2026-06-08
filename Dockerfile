@@ -4,10 +4,12 @@ WORKDIR /var/www
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git curl unzip zip libpng-dev libonig-dev libxml2-dev ca-certificates gnupg \
-    && docker-php-ext-install pdo pdo_mysql pdo_sqlite \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    git curl unzip zip libpng-dev libonig-dev libxml2-dev \
+    ca-certificates gnupg \
+    && apt-get update \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && docker-php-ext-install pdo pdo_mysql pdo_sqlite
 
 # Install Node.js 20 - Method 2 (NodeSource)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
