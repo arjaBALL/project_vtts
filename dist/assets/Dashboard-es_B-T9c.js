@@ -1,0 +1,1 @@
+import{t as e}from"./app-CLjexJ8E.js";import{t}from"./AppLayout-S_n6oowd.js";var n=e();function r(){return(0,n.jsx)(t,{children:(0,n.jsxs)(`div`,{className:`p-6`,children:[(0,n.jsx)(`h1`,{className:`text-2xl font-bold`,children:`Dashboard Page`}),(0,n.jsx)(`p`,{children:`Welcome to your dashboard!`})]})})}export{r as default};
