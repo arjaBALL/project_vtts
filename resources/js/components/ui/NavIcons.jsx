@@ -8,6 +8,8 @@ import {
     CarFront,
     Ship,
     Database,
+    LogOutIcon,
+    UserCircle2Icon,
 } from "lucide-react";
 
 export default function NavIcon({ name }) {
@@ -21,6 +23,8 @@ export default function NavIcon({ name }) {
         carFront: <CarFront size={18} />,
         ship: <Ship size={18} />,
         database: <Database size={18} />,
+        logout: <LogOutIcon size={18} />,
+        userCircle2Icon: <UserCircle2Icon size={18} />,
     };
 
     return icons[name] ?? null;

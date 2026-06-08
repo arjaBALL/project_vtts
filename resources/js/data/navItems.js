@@ -65,4 +65,17 @@ export const navItems = [
             },
         ],
     },
+    {
+        section: "Account",
+        items: [
+            {
+                label: "Profile",
+                icon: "userCircle2Icon",
+            },
+            {
+                label: "Logout",
+                icon: "logout",
+            },
+        ],
+    },
 ];

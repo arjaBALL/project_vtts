@@ -8,22 +8,26 @@ export default function Drivers() {
     const [open, setOpen] = useState(false);
     return (
         <AppLayout>
-            <div className="p-6">
-                <h1 className="text-2xl font-bold">Drivers Page</h1>
-                <p className="text-[12px] text-gray-300 mb-3">
-                    Drivers list and management interface will go here. You can
-                    add, edit, or remove drivers from this page.
-                </p>
-                <div className="mb-4">
+            <div className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    <div>
+                        <h1 className="text-xl sm:text-2xl font-bold">
+                            Drivers Page
+                        </h1>
+                        <p className="text-[12px] text-gray-300 mt-1">
+                            Drivers list and management interface will go here.
+                            You can add, edit, or remove drivers from this page.
+                        </p>
+                    </div>
                     <button
                         onClick={() => setOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition w-fit shrink-0"
                     >
                         <UserRoundKey size={18} />
                         <span>New Driver</span>
                     </button>
                 </div>
-                <div className="rounded-lg border border-gray-700 overflow-hidden">
+                <div className="rounded-lg border border-gray-700 overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-700 text-center">
                         <thead>
                             <tr>
@@ -59,7 +63,7 @@ export default function Drivers() {
                                 </td>
                                 <td className="px-6 py-3 text-sm text-right">
                                     <div className="flex justify-end gap-2">
-                                        <button className="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 transition">
+                                        <button className="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-md bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition">
                                             <PenLine size={12} />
                                             Edit
                                         </button>
