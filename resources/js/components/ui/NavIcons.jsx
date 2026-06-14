@@ -10,6 +10,10 @@ import {
     Database,
     LogOutIcon,
     UserCircle2Icon,
+    TicketPlus,
+    Tag,
+    ListTodo,
+    ListCheck,
 } from "lucide-react";
 
 export default function NavIcon({ name }) {
@@ -25,6 +29,10 @@ export default function NavIcon({ name }) {
         database: <Database size={18} />,
         logout: <LogOutIcon size={18} />,
         userCircle2Icon: <UserCircle2Icon size={18} />,
+        ticketPlus: <TicketPlus size={18} />,
+        tag: <Tag size={18} />,
+        listTodo: <ListTodo size={18} />,
+        listCheck: <ListCheck size={18} />,
     };
 
     return icons[name] ?? null;

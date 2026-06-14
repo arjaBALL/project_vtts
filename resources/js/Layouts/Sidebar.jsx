@@ -189,6 +189,17 @@ export default function Sidebar({ mobileOpen, onClose }) {
                                             {!collapsed && (
                                                 <span>{item.label}</span>
                                             )}
+                                            {item.badge != null && (
+                                                <span
+                                                    className={`flex items-center justify-center text-[10px] font-semibold rounded-full bg-blue-500 text-white ${
+                                                        collapsed
+                                                            ? "absolute top-1 right-1 w-2 h-2 p-0"
+                                                            : "min-w-[18px] h-[18px] px-1"
+                                                    }`}
+                                                >
+                                                    {!collapsed && item.badge}
+                                                </span>
+                                            )}
                                         </button>
                                     )}
                                 </div>

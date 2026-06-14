@@ -10,15 +10,15 @@ export const navItems = [
             },
             {
                 label: "Request Trip Ticket",
-                icon: "ticket",
+                icon: "ticketPlus",
                 href: "/request-trip-ticket",
                 badge: null,
             },
             {
                 label: "My Tickets",
-                icon: "ticket",
+                icon: "tag",
                 href: "/my-tickets",
-                badge: 3,
+                badge: 5,
             },
         ],
     },
@@ -27,13 +27,13 @@ export const navItems = [
         items: [
             {
                 label: "Incoming Queue",
-                icon: "bell",
+                icon: "listTodo",
                 href: "/incoming-queue",
                 badge: 5,
             },
             {
                 label: "Assign & Review",
-                icon: "bell",
+                icon: "listCheck",
                 href: "/assign-review",
                 badge: null,
             },
