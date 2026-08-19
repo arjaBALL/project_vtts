@@ -1,37 +1,80 @@
-import { useState } from "react";
-import { ChevronLeft, ChevronDown } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+    ChevronLeft,
+    ChevronDown,
+    LogOut,
+    Settings,
+    User,
+    HelpCircle,
+} from "lucide-react";
 import { navItems } from "../data/navItems";
 import NavIcon from "../components/ui/NavIcons";
-import { router } from "@inertiajs/react";
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 
 export default function Sidebar({ mobileOpen, onClose }) {
-    const [collapsed, setCollapsed] = useState(false);
-    const [active, setActive] = useState("Dashboard");
-    const [openMenus, setOpenMenus] = useState({
-        "Data Management": false,
+    const { url } = usePage();
+    const currentPath = url?.split("?")[0] ?? "";
+
+    const [collapsed, setCollapsed] = useState(() => {
+        if (typeof window === "undefined") return false;
+        return localStorage.getItem("sidebar:collapsed") === "1";
     });
+    const [hoveredParent, setHoveredParent] = useState(null);
+    const [hoveredTooltip, setHoveredTooltip] = useState(null);
+
+    const isActiveHref = (href) =>
+        !!href &&
+        (currentPath === href ||
+            currentPath.startsWith(href.endsWith("/") ? href : href + "/"));
+
+    const isParentActive = (item) =>
+        item.children?.some((child) => isActiveHref(child.href)) ?? false;
+
+    const [openMenus, setOpenMenus] = useState({});
+    useEffect(() => {
+        const activeParent = navItems
+            .flatMap((s) => s.items)
+            .find((item) => item.children && isParentActive(item));
+        if (activeParent) {
+            setOpenMenus((prev) => ({ ...prev, [activeParent.label]: true }));
+        }
+    }, [currentPath]);
+
+    useEffect(() => {
+        localStorage.setItem("sidebar:collapsed", collapsed ? "1" : "0");
+    }, [collapsed]);
+
+    const go = (href) => {
+        router.visit(href);
+        onClose?.();
+    };
 
     return (
         <div className="md:relative md:shrink-0 overflow-visible">
+            {/* Mobile scrim with blur */}
+            {mobileOpen && (
+                <div
+                    onClick={onClose}
+                    className="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-20 md:hidden animate-in fade-in duration-200"
+                />
+            )}
+
             <aside
                 className={`
-                    fixed md:relative z-30 flex flex-col bg-blue-50 border-r border-blue-200
+                    fixed md:relative z-30 flex flex-col bg-gradient-to-b from-white to-slate-50/80 border-r border-slate-200/80
                     transition-[width,transform] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
-                    overflow-visible h-screen
-                    /* Mobile: slide in/out from left */
+                    overflow-visible h-screen shadow-2xl shadow-slate-900/10 md:shadow-sm
                     ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
                     md:translate-x-0
-                    /* Desktop: collapse/expand width */
-                    ${collapsed ? "md:w-16" : "md:w-60"}
-                    /* Mobile always full width when open */
-                    w-60
+                    ${collapsed ? "md:w-[72px]" : "md:w-[280px]"}
+                    w-[280px]
                 `}
             >
-                {/* Logo */}
-                <div className="flex items-center min-h-16 px-3 gap-3">
-                    <div className="w-8 h-8 min-w-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-semibold text-sm shrink-0">
+                {/* Logo with gradient accent */}
+                <div className="flex items-center h-16 shrink-0 px-4 gap-3 border-b border-slate-200/60 bg-gradient-to-r from-teal-600/5 to-transparent">
+                    <div className="relative w-9 h-9 min-w-9 rounded-xl bg-gradient-to-br from-teal-600 to-teal-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-teal-500/25">
                         T
+                        <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white animate-pulse" />
                     </div>
                     <div
                         className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
@@ -40,192 +83,378 @@ export default function Sidebar({ mobileOpen, onClose }) {
                                 : "max-w-[200px] opacity-100"
                         }`}
                     >
-                        <p className="text-sm font-semibold text-blue-900 m-0">
+                        <p className="text-[14px] font-bold text-slate-900 m-0 leading-tight tracking-tight">
                             AquaTrip
                         </p>
-                        <p className="text-[10px] uppercase tracking-widest text-blue-400 m-0">
-                            Trip ticket Management
+                        <p className="text-[10.5px] text-slate-400 m-0 font-medium tracking-wide">
+                            Trip Ticket Management
                         </p>
                     </div>
                 </div>
 
-                {/* Nav */}
-                <nav
-                    className={`flex-1 overflow-y-auto px-2 py-2 space-y-4 scrollbar-thin scrollbar-thumb-blue-300 ${
-                        collapsed ? "mx-0" : "mx-0"
-                    }`}
-                >
+                {/* Nav with improved spacing */}
+                <nav className="flex-1 overflow-y-auto overflow-x-visible px-3 py-5 space-y-5 [scrollbar-width:thin] [scrollbar-color:theme(colors.slate.200)_transparent] hover:[scrollbar-color:theme(colors.slate.300)_transparent]">
                     {navItems.map(({ section, items }) => (
                         <div key={section}>
-                            {/* Section label */}
-                            <p
-                                className={`text-[10px] uppercase tracking-widest text-blue-400 font-semibold px-2 overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-                                    collapsed
-                                        ? "max-h-0 opacity-0 mb-0 pb-0"
-                                        : "max-h-6 opacity-100 mb-1"
-                                }`}
-                            >
-                                {section}
-                            </p>
+                            {/* Section label with dot */}
+                            {!collapsed ? (
+                                <div className="flex items-center gap-2 px-3 mb-2">
+                                    <span className="w-1 h-1 rounded-full bg-teal-400" />
+                                    <p className="text-[10px] uppercase tracking-[0.15em] text-slate-400 font-semibold">
+                                        {section}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="mx-3 mb-3 border-t border-slate-200/60" />
+                            )}
 
-                            {items.map((item) => (
-                                <div key={item.label}>
-                                    {item.children ? (
-                                        <>
-                                            {/* Parent button — hidden when collapsed */}
-                                            {!collapsed && (
-                                                <button
-                                                    onClick={() =>
-                                                        setOpenMenus(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                [item.label]:
-                                                                    !prev[
+                            <div className="space-y-0.5">
+                                {items.map((item) => {
+                                    const active = item.children
+                                        ? isParentActive(item)
+                                        : isActiveHref(item.href);
+
+                                    return (
+                                        <div
+                                            key={item.label}
+                                            className="relative"
+                                            onMouseEnter={() => {
+                                                if (collapsed) {
+                                                    setHoveredParent(
+                                                        item.label,
+                                                    );
+                                                }
+                                            }}
+                                            onMouseLeave={() => {
+                                                if (collapsed) {
+                                                    setHoveredParent(null);
+                                                    setHoveredTooltip(null);
+                                                }
+                                            }}
+                                        >
+                                            {item.children ? (
+                                                <>
+                                                    <button
+                                                        onClick={() =>
+                                                            !collapsed &&
+                                                            setOpenMenus(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    [item.label]:
+                                                                        !prev[
+                                                                            item
+                                                                                .label
+                                                                        ],
+                                                                }),
+                                                            )
+                                                        }
+                                                        aria-expanded={
+                                                            !!openMenus[
+                                                                item.label
+                                                            ]
+                                                        }
+                                                        className={`w-full flex items-center rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 ${
+                                                            collapsed
+                                                                ? "justify-center px-0 py-2.5"
+                                                                : "justify-between px-3 py-2.5"
+                                                        } ${
+                                                            active
+                                                                ? "text-slate-900 bg-gradient-to-r from-teal-50/80 to-transparent"
+                                                                : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div
+                                                                className={`${active ? "text-teal-600" : "text-slate-400"} transition-colors duration-200`}
+                                                            >
+                                                                <NavIcon
+                                                                    name={
+                                                                        item.icon
+                                                                    }
+                                                                />
+                                                            </div>
+                                                            {!collapsed && (
+                                                                <span className="text-[13.5px]">
+                                                                    {item.label}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {!collapsed && (
+                                                            <ChevronDown
+                                                                size={15}
+                                                                className={`text-slate-400 transition-transform duration-300 ${
+                                                                    openMenus[
                                                                         item
                                                                             .label
-                                                                    ],
-                                                            }),
-                                                        )
+                                                                    ]
+                                                                        ? "rotate-180"
+                                                                        : ""
+                                                                }`}
+                                                            />
+                                                        )}
+                                                    </button>
+
+                                                    {/* Expanded children with card-like appearance */}
+                                                    {!collapsed &&
+                                                        openMenus[
+                                                            item.label
+                                                        ] && (
+                                                            <div className="relative ml-[27px] mt-1 mb-1.5 space-y-0.5 bg-slate-50/50 rounded-xl p-1">
+                                                                <div className="absolute left-2.5 top-2 bottom-2 w-[2px] bg-gradient-to-b from-teal-400/40 to-transparent rounded-full" />
+                                                                {item.children.map(
+                                                                    (child) => {
+                                                                        const childActive =
+                                                                            isActiveHref(
+                                                                                child.href,
+                                                                            );
+                                                                        return (
+                                                                            <button
+                                                                                key={
+                                                                                    child.label
+                                                                                }
+                                                                                onClick={() =>
+                                                                                    go(
+                                                                                        child.href,
+                                                                                    )
+                                                                                }
+                                                                                aria-current={
+                                                                                    childActive
+                                                                                        ? "page"
+                                                                                        : undefined
+                                                                                }
+                                                                                className={`relative w-full flex items-center gap-2.5 pl-5 pr-3 py-2 text-sm rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 ${
+                                                                                    childActive
+                                                                                        ? "bg-white shadow-sm text-teal-700 font-medium"
+                                                                                        : "text-slate-500 font-normal hover:bg-white/80 hover:text-slate-800"
+                                                                                }`}
+                                                                            >
+                                                                                <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center">
+                                                                                    <span
+                                                                                        className={`w-2 h-[2px] rounded-full transition-all duration-200 ${
+                                                                                            childActive
+                                                                                                ? "bg-teal-500 w-3"
+                                                                                                : "bg-slate-300"
+                                                                                        }`}
+                                                                                    />
+                                                                                </span>
+                                                                                <span className="ml-1.5">
+                                                                                    <NavIcon
+                                                                                        name={
+                                                                                            child.icon
+                                                                                        }
+                                                                                        className={`${
+                                                                                            childActive
+                                                                                                ? "text-teal-600"
+                                                                                                : "text-slate-400"
+                                                                                        }`}
+                                                                                    />
+                                                                                </span>
+                                                                                <span className="text-[13px]">
+                                                                                    {
+                                                                                        child.label
+                                                                                    }
+                                                                                </span>
+                                                                            </button>
+                                                                        );
+                                                                    },
+                                                                )}
+                                                            </div>
+                                                        )}
+
+                                                    {/* Collapsed: enhanced flyout */}
+                                                    {collapsed &&
+                                                        hoveredParent ===
+                                                            item.label && (
+                                                            <div
+                                                                className="absolute left-full top-0 ml-3 w-56 py-2 bg-white border border-slate-200/80 rounded-2xl shadow-2xl shadow-slate-900/15 z-50 animate-in slide-in-from-left-2 duration-200"
+                                                                onMouseEnter={() =>
+                                                                    setHoveredTooltip(
+                                                                        item.label,
+                                                                    )
+                                                                }
+                                                                onMouseLeave={() =>
+                                                                    setHoveredTooltip(
+                                                                        null,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <div className="px-3 py-2 border-b border-slate-100">
+                                                                    <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400 font-semibold">
+                                                                        {
+                                                                            item.label
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                                <div className="py-1">
+                                                                    {item.children.map(
+                                                                        (
+                                                                            child,
+                                                                        ) => {
+                                                                            const childActive =
+                                                                                isActiveHref(
+                                                                                    child.href,
+                                                                                );
+                                                                            return (
+                                                                                <button
+                                                                                    key={
+                                                                                        child.label
+                                                                                    }
+                                                                                    onClick={() =>
+                                                                                        go(
+                                                                                            child.href,
+                                                                                        )
+                                                                                    }
+                                                                                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-left transition-all duration-150 ${
+                                                                                        childActive
+                                                                                            ? "bg-teal-50 text-teal-700 font-medium"
+                                                                                            : "text-slate-600 hover:bg-slate-50"
+                                                                                    } ${
+                                                                                        childActive
+                                                                                            ? "border-l-2 border-teal-500"
+                                                                                            : ""
+                                                                                    }`}
+                                                                                >
+                                                                                    <NavIcon
+                                                                                        name={
+                                                                                            child.icon
+                                                                                        }
+                                                                                        className={`${
+                                                                                            childActive
+                                                                                                ? "text-teal-600"
+                                                                                                : "text-slate-400"
+                                                                                        }`}
+                                                                                    />
+                                                                                    <span className="text-[13px]">
+                                                                                        {
+                                                                                            child.label
+                                                                                        }
+                                                                                    </span>
+                                                                                </button>
+                                                                            );
+                                                                        },
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                </>
+                                            ) : (
+                                                <button
+                                                    onClick={() =>
+                                                        go(item.href)
                                                     }
-                                                    className="w-full flex items-center justify-between text-sm font-medium px-2 py-2 rounded-md text-blue-800 hover:bg-blue-100"
+                                                    aria-current={
+                                                        active
+                                                            ? "page"
+                                                            : undefined
+                                                    }
+                                                    className={`relative w-full flex items-center text-sm font-medium rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 group ${
+                                                        collapsed
+                                                            ? "justify-center px-0 py-2.5"
+                                                            : "justify-start gap-3 px-3 py-2.5"
+                                                    } ${
+                                                        active
+                                                            ? "bg-gradient-to-r from-teal-50/80 to-transparent text-teal-700 shadow-sm"
+                                                            : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
+                                                    }`}
                                                 >
-                                                    <div className="flex items-center gap-3">
+                                                    {active && (
+                                                        <span
+                                                            className={`absolute bg-gradient-to-b from-teal-500 to-teal-600 rounded-full shadow-md shadow-teal-500/30 ${
+                                                                collapsed
+                                                                    ? "left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5"
+                                                                    : "left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full"
+                                                            }`}
+                                                        />
+                                                    )}
+                                                    <div
+                                                        className={`${active ? "text-teal-600" : "text-slate-400"} transition-colors duration-200 group-hover:${!active ? "text-slate-500" : ""}`}
+                                                    >
                                                         <NavIcon
                                                             name={item.icon}
                                                         />
-                                                        <span>
+                                                    </div>
+                                                    {!collapsed && (
+                                                        <span className="text-[13.5px]">
                                                             {item.label}
                                                         </span>
-                                                    </div>
-                                                    <ChevronDown
-                                                        size={14}
-                                                        className={`text-blue-400 transition-transform duration-200 ${
-                                                            openMenus[
-                                                                item.label
-                                                            ]
-                                                                ? "rotate-180"
-                                                                : ""
-                                                        }`}
-                                                    />
+                                                    )}
                                                 </button>
                                             )}
 
-                                            {/* Children — only when expanded AND not collapsed */}
-                                            {!collapsed &&
-                                                openMenus[item.label] && (
-                                                    <div className="relative ml-4.5 mt-1 mb-2 space-y-1">
-                                                        {/* Vertical connector line */}
-                                                        <span className="absolute left-0 top-0 bottom-0 w-px bg-blue-200" />
-
-                                                        {item.children.map(
-                                                            (child) => (
-                                                                <button
-                                                                    key={
-                                                                        child.label
-                                                                    }
-                                                                    onClick={() => {
-                                                                        setActive(
-                                                                            child.label,
-                                                                        );
-                                                                        router.visit(
-                                                                            child.href,
-                                                                        );
-                                                                    }}
-                                                                    className={`relative w-full flex items-center gap-2 pl-7 pr-2 py-1.5 text-sm font-medium rounded-md group ${
-                                                                        active ===
-                                                                        child.label
-                                                                            ? "bg-white text-blue-700 shadow-sm"
-                                                                            : "text-blue-700 hover:bg-blue-100"
-                                                                    }`}
-                                                                >
-                                                                    {/* Horizontal stub + bullet */}
-                                                                    <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center">
-                                                                        {/* Horizontal line stub */}
-                                                                        <span className="w-3 h-px bg-blue-200 inline-block" />
-                                                                        {/* Bullet dot */}
-                                                                        <span
-                                                                            className={`w-1.5 h-1.5 border rotate-45 border-blue-300 inline-block -ml-px transition-colors ${
-                                                                                active ===
-                                                                                child.label
-                                                                                    ? "bg-blue-500 border-blue-500"
-                                                                                    : "bg-blue-50 group-hover:bg-blue-300 group-hover:border-blue-400"
-                                                                            }`}
-                                                                        />
-                                                                    </span>
-
-                                                                    <NavIcon
-                                                                        name={
-                                                                            child.icon
-                                                                        }
-                                                                    />
-                                                                    <span>
-                                                                        {
-                                                                            child.label
-                                                                        }
-                                                                    </span>
-                                                                </button>
-                                                            ),
-                                                        )}
+                                            {/* Collapsed: enhanced tooltip for leaf items */}
+                                            {collapsed &&
+                                                !item.children &&
+                                                hoveredParent ===
+                                                    item.label && (
+                                                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 rounded-lg bg-slate-800 text-white text-xs font-medium whitespace-nowrap shadow-xl z-50 animate-in slide-in-from-left-2 duration-150">
+                                                        {item.label}
+                                                        <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45" />
                                                     </div>
                                                 )}
-                                        </>
-                                    ) : (
-                                        <button
-                                            onClick={() => {
-                                                setActive(item.label);
-                                                router.visit(item.href);
-                                            }}
-                                            className={`w-full flex items-center text-sm font-medium rounded-md transition-all mb-1 ${
-                                                collapsed
-                                                    ? "justify-center px-0 py-2"
-                                                    : "justify-start gap-2 px-2 py-2"
-                                            } ${
-                                                active === item.label
-                                                    ? "bg-white text-blue-700 shadow-sm"
-                                                    : "text-blue-800 hover:bg-blue-100"
-                                            }`}
-                                        >
-                                            <NavIcon name={item.icon} />
-                                            {!collapsed && (
-                                                <span>{item.label}</span>
-                                            )}
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     ))}
                 </nav>
 
-                {/* User */}
-                <div className="flex items-center gap-3 p-4 border-t border-blue-200 overflow-hidden mt-auto">
-                    <div className="w-8 h-8 min-w-[32px] bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                        JD
+                {/* User section with improved design */}
+                <div
+                    className={`flex items-center gap-3 border-t border-slate-200/60 bg-gradient-to-b from-transparent to-slate-50/50 shrink-0 ${
+                        collapsed ? "justify-center p-3" : "p-4"
+                    }`}
+                >
+                    <div className="relative shrink-0 group cursor-pointer">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-600 to-teal-500 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-teal-500/20 transition-transform duration-200 group-hover:scale-105">
+                            JD
+                        </div>
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white shadow-sm shadow-emerald-400/40" />
+                        <div className="absolute inset-0 rounded-full ring-2 ring-teal-500/20 group-hover:ring-teal-500/40 transition-all duration-200" />
                     </div>
                     <div
-                        className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                        className={`flex-1 overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
                             collapsed
                                 ? "max-w-0 opacity-0"
-                                : "max-w-[200px] opacity-100"
+                                : "max-w-[160px] opacity-100"
                         }`}
                     >
-                        <p className="text-xs font-medium text-blue-900">
+                        <p className="text-[13px] font-semibold text-slate-800 truncate">
                             Juan Dela Cruz
                         </p>
-                        <p className="text-[10px] text-blue-400">Requester</p>
+                        <p className="text-[10.5px] text-slate-400 font-medium flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-emerald-400 inline-block" />
+                            Requester
+                        </p>
                     </div>
+                    {!collapsed && (
+                        <div className="flex items-center gap-1">
+                            <button
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200"
+                                aria-label="Settings"
+                            >
+                                <Settings size={16} />
+                            </button>
+                            <button
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
+                                aria-label="Log out"
+                            >
+                                <LogOut size={16} />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </aside>
-            {/* Toggle button */}
 
+            {/* Toggle button with improved design */}
             <button
-                onClick={() => setCollapsed(!collapsed)}
-                className="hidden md:flex absolute top-13 -right-3.5 -translate-y-1/2 w-7 h-7 bg-white border-2 border-blue-600 rounded-full items-center justify-center shadow-sm hover:bg-blue-100 transition-colors z-50"
+                onClick={() => setCollapsed((v) => !v)}
+                className="hidden md:flex absolute top-8 -right-3.5 -translate-y-1/2 w-7 h-7 bg-white border-2 border-slate-200/80 rounded-full items-center justify-center shadow-md hover:shadow-lg hover:border-teal-400 hover:bg-teal-50 transition-all duration-300 z-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40 group"
                 aria-label="Toggle sidebar"
             >
                 <ChevronLeft
-                    size={16}
-                    className={`text-blue-600 transition-transform duration-300 ${
+                    size={14}
+                    className={`text-slate-500 transition-all duration-300 group-hover:text-teal-600 ${
                         collapsed ? "rotate-180" : ""
                     }`}
                 />
