@@ -7,12 +7,13 @@ import {
     TextInput,
     SelectInput,
     DateInput,
+    NumberInput,
     TextArea,
 } from "../../components/ui/Inputs";
 
 function Field({ label, htmlFor, children }) {
     return (
-        <div className="mb-4">
+        <div className="mb-3">
             <label
                 htmlFor={htmlFor}
                 className="block text-[13px] font-medium tracking-wide text-slate-600 dark:text-slate-300 mb-1.5"
@@ -31,11 +32,26 @@ export default function RequestTripTicket() {
         <AppLayout>
             <div className="min-h-full">
                 <div className="p-6">
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="flex items-start ">
                         <PageHeader
                             title="Request Trip Ticket"
                             description="Create and submit a new trip ticket request."
                         />
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4 flex-wrap my-4">
+                        <div className="relative flex-1 max-w-xs">
+                            <Search
+                                size={16}
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Search by name or office..."
+                                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+                            />
+                        </div>
+
                         <button
                             type="button"
                             onClick={() => setOpen(true)}
@@ -169,7 +185,7 @@ export default function RequestTripTicket() {
                         Details
                     </p>
 
-                    <form className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <form className="grid grid-cols-1 gap-1 md:grid-cols-2">
                         {/* Departure Date */}
                         <Field label="Departure Date" htmlFor="departure_date">
                             <TextInput
@@ -195,6 +211,16 @@ export default function RequestTripTicket() {
                                     id="destination"
                                     name="destination"
                                     placeholder="Enter destination"
+                                />
+                            </Field>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <Field label="Passengers" htmlFor="passengers">
+                                <NumberInput
+                                    id="Passengers"
+                                    name="passengers"
+                                    placeholder="Enter Passengers"
                                 />
                             </Field>
                         </div>

@@ -48,3 +48,7 @@ Route::get('/users', function () {
 Route::get('/vehicles', function () {
     return Inertia::render('DataManagement/Vehicles');
 });
+
+Route::get('/profile', function () {
+    return Inertia::render('Account/Profile');
+});
