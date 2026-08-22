@@ -1,25 +1,31 @@
 import {
     LayoutDashboard,
     Ticket,
-    Bell,
-    UserPlus,
+    ClipboardCheck,
+    Route,
+    Database,
     UserKey,
-    Compass,
+    UserPlus,
     CarFront,
-    Ship,
+    CircleUserRound,
+    LogOut,
 } from "lucide-react";
 
-export default function NavIcon({ name }) {
+export default function NavIcon({ name, size = 18, strokeWidth = 1.8 }) {
     const icons = {
-        dashboard: <LayoutDashboard size={20} />,
-        ticket: <Ticket size={20} />,
-        bell: <Bell size={20} />,
-        userPlus: <UserPlus size={20} />,
-        userkey: <UserKey size={20} />,
-        compass: <Compass size={20} />,
-        carFront: <CarFront size={20} />,
-        ship: <Ship size={20} />,
+        dashboard: LayoutDashboard,
+        ticket: Ticket,
+        clipboardCheck: ClipboardCheck,
+        route: Route,
+        database: Database,
+        userkey: UserKey,
+        userPlus: UserPlus,
+        carFront: CarFront,
+        userCircle2Icon: CircleUserRound,
+        logout: LogOut,
     };
 
-    return icons[name] ?? null;
+    const Icon = icons[name];
+
+    return Icon ? <Icon size={size} strokeWidth={strokeWidth} /> : null;
 }

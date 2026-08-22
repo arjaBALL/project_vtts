@@ -30,23 +30,23 @@ export default function Drawer({
             {/* Backdrop */}
             <div
                 onClick={onClose}
-                className="absolute inset-0 bg-gray-900/50"
+                className="absolute inset-0 bg-slate-900/40 dark:bg-black/60"
             />
 
             {/* Panel */}
             <div className="absolute inset-0 flex justify-end">
-                <div className="w-full max-w-md bg-gray-800 shadow-xl flex flex-col animate-slide-in">
+                <div className="w-full max-w-md bg-white dark:bg-slate-800 shadow-xl flex flex-col animate-slide-in">
                     {/* Header */}
-                    <div className="px-4 py-3 border-b border-white/10">
+                    <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
                         {/* Top row */}
                         <div className="flex items-center justify-between">
-                            <h2 className="text-white font-semibold">
+                            <h2 className="text-slate-900 dark:text-white font-semibold">
                                 {title}
                             </h2>
 
                             <button
                                 onClick={onClose}
-                                className="text-gray-400 hover:text-white"
+                                className="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white transition-colors"
                             >
                                 ✕
                             </button>
@@ -54,18 +54,19 @@ export default function Drawer({
 
                         {/* Subtitle */}
                         {subtitle && (
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                                 {subtitle}
                             </p>
                         )}
                     </div>
 
                     {/* Content */}
-                    <div className="p-4 overflow-y-auto flex-1 text-white">
+                    <div className="p-4 overflow-y-auto flex-1 text-slate-700 dark:text-slate-200 scrollbar-thin scrollbar-thumb-blue-500/20 scrollbar-track-transparent scrollbar-thumb-rounded-full hover:scrollbar-thumb-blue-500/40 scroll-smooth">
                         {children}
                     </div>
+
                     {footer && (
-                        <div className="px-4 py-3 border-t border-white/10 bg-gray-800">
+                        <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
                             {footer}
                         </div>
                     )}

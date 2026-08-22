@@ -1,4 +1,4 @@
-import AppLayout from "../Layouts/AppLayout"; // Go up one level, then into Layouts
+import AppLayout from "../../Layouts/AppLayout"; // Go up one level, then into Layouts
 
 export default function MyTicket() {
     return (

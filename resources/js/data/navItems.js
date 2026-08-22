@@ -9,56 +9,63 @@ export const navItems = [
                 badge: null,
             },
             {
-                label: "Request Trip Ticket",
+                label: "My Trip Tickets",
                 icon: "ticket",
                 href: "/request-trip-ticket",
                 badge: null,
             },
-            {
-                label: "My Tickets",
-                icon: "ticket",
-                href: "/my-tickets",
-                badge: 3,
-            },
         ],
     },
     {
-        section: "Processor",
+        section: "Trip Processing",
         items: [
             {
-                label: "Incoming Queue",
-                icon: "bell",
-                href: "/incoming-queue",
-                badge: 5,
-            },
-            {
-                label: "Assign & Review",
-                icon: "bell",
+                label: "Review & Assign",
+                icon: "clipboardCheck",
                 href: "/assign-review",
                 badge: null,
             },
+            {
+                label: "Assigned Trips",
+                icon: "route",
+                href: "/incoming-queue",
+                badge: 5,
+            },
         ],
     },
     {
-        section: "Data Management",
+        section: "Administrator",
         items: [
             {
-                label: "Drivers",
-                icon: "userkey",
-                href: "/drivers",
-                badge: null,
+                label: "Data Management",
+                icon: "database",
+                children: [
+                    {
+                        label: "Drivers",
+                        icon: "userkey",
+                        href: "/drivers",
+                    },
+                    {
+                        label: "Users",
+                        icon: "userPlus",
+                        href: "/users",
+                    },
+                    {
+                        label: "Vehicles",
+                        icon: "carFront",
+                        href: "/vehicles",
+                    },
+                ],
             },
+        ],
+    },
+    {
+        section: "Account",
+        items: [
             {
-                label: "User",
-                icon: "userPlus",
-                href: "/users",
-                badge: null,
-            },
-            {
-                label: "Vehicles",
-                icon: "carFront",
-                href: "/vehicles",
-                badge: null,
+                label: "Profile",
+                icon: "userCircle2Icon",
+                href: "/profile",
             },
         ],
     },

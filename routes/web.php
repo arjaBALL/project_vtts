@@ -8,53 +8,47 @@ use Inertia\Inertia;
 | Web Routes
 |--------------------------------------------------------------------------
 */
-// Default route (optional redirect)
+
 Route::get('/', function () {
     return redirect('/dashboard');
 });
 
 // * Main Pages
+Route::get('/dashboard', function () {
+    return Inertia::render('Main/Dashboard');
+});
 
-    // Dashboard
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    });
+// * Requester Pages
+Route::get('/request-trip-ticket', function () {
+    return Inertia::render('Requester/RequestTripTickets');
+});
 
-    //  Requests Trip Ticket
-    Route::get('/request-trip-ticket', function () {
-        return Inertia::render('RequestTripTickets');
-    });
-
-    // My Tickets
-    Route::get('/my-tickets', function () {
-        return Inertia::render('MyTickets');
-    });
+Route::get('/my-tickets', function () {
+    return Inertia::render('Requester/MyTickets');
+});
 
 // * Processor Pages
+Route::get('/incoming-queue', function () {
+    return Inertia::render('Processor/IncomingQueue');
+});
 
-    // Incoming Queue
-    Route::get('/incoming-queue', function () {
-        return Inertia::render('incomingqueue');
-    });
-
-    // Assign & Review
-    Route::get('/assign-review', function () {
-        return Inertia::render('AssignReview');
-    });
+Route::get('/assign-review', function () {
+    return Inertia::render('Processor/AssignReview');
+});
 
 // * Data Management Pages
+Route::get('/drivers', function () {
+    return Inertia::render('DataManagement/Drivers');
+});
 
-    // Drivers
-    Route::get('/drivers', function () {
-        return Inertia::render('Drivers');
-    });
+Route::get('/users', function () {
+    return Inertia::render('DataManagement/Users');
+});
 
-    // Users
-    Route::get('/users', function () {
-        return Inertia::render('Users');
-    });
+Route::get('/vehicles', function () {
+    return Inertia::render('DataManagement/Vehicles');
+});
 
-    // Vehicles
-    Route::get('/vehicles', function () {
-        return Inertia::render('Vehicles');
-    });
+Route::get('/profile', function () {
+    return Inertia::render('Account/Profile');
+});

@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
 @source "../../resources/js/**/*.{js,jsx}";
 
@@ -8,6 +7,7 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
     --font-sans:
