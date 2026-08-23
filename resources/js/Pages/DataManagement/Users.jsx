@@ -1,6 +1,11 @@
 import AppLayout from "../../Layouts/AppLayout";
 import Drawer from "../../components/ui/Drawer";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useForm, router } from "@inertiajs/react";
+import toast from "react-hot-toast";
+import { PageHeader } from "../../components/ui/PageHeader";
+import Pagination from "../../components/ui/Pagination";
+import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import {
     UserPlus2,
     Search,
@@ -8,42 +13,23 @@ import {
     Pencil,
     Trash2,
 } from "lucide-react";
-import { TextInput, SelectInput } from "../../components/ui/Inputs";
-
-// TODO: replace with real data from the backend (Inertia props / fetch)
-const MOCK_USERS = [
-    {
-        id: 1,
-        name: "Arjay Santos",
-        office: "Main Office",
-        role: "Acceptor",
-        status: "Active",
-    },
-    {
-        id: 2,
-        name: "Maria Cruz",
-        office: "North Branch",
-        role: "Dispatcher",
-        status: "Active",
-    },
-    {
-        id: 3,
-        name: "Pedro Reyes",
-        office: "Main Office",
-        role: "Driver",
-        status: "Inactive",
-    },
-];
+import {
+    TextInput,
+    SelectInput,
+    PasswordInput,
+} from "../../components/ui/Inputs";
 
 const STATUS_STYLES = {
-    Active: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/30",
-    Inactive:
+    active: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/30",
+    inactive:
         "bg-slate-100 text-slate-500 ring-1 ring-inset ring-slate-500/15 dark:bg-slate-500/10 dark:text-slate-400 dark:ring-slate-500/20",
 };
 
 function initials(name) {
+    if (!name) return "?";
     return name
         .split(" ")
+        .filter(Boolean)
         .map((p) => p[0])
         .slice(0, 2)
         .join("")
@@ -76,31 +62,129 @@ function Field({ label, htmlFor, children }) {
     );
 }
 
-export default function Users() {
+export default function Users({ users, filters }) {
     const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState("");
+    const [query, setQuery] = useState(filters?.search ?? "");
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
 
-    const filtered = useMemo(() => {
-        const q = query.trim().toLowerCase();
-        if (!q) return MOCK_USERS;
-        return MOCK_USERS.filter((u) =>
-            [u.name, u.office, u.role].some((v) => v.toLowerCase().includes(q)),
+    const {
+        data,
+        post,
+        setData,
+        processing,
+        errors,
+        setError,
+        clearErrors,
+        reset,
+    } = useForm({
+        username: "",
+        first_name: "",
+        middle_name: "",
+        last_name: "",
+        role: "",
+        password: "",
+        password_confirmation: "",
+    });
+
+    const validate = () => {
+        clearErrors();
+        const newErrors = {};
+
+        if (!data.first_name.trim())
+            newErrors.first_name = "First name is required.";
+        if (!data.last_name.trim())
+            newErrors.last_name = "Last name is required.";
+        if (!data.username.trim()) newErrors.username = "Username is required.";
+        else if (data.username.trim().length < 3)
+            newErrors.username = "Username must be at least 3 characters.";
+        if (!data.role) newErrors.role = "Please select a role.";
+        if (!data.password) newErrors.password = "Password is required.";
+        else if (data.password.length < 8)
+            newErrors.password = "Password must be at least 8 characters.";
+        if (data.password !== data.password_confirmation)
+            newErrors.password_confirmation = "Passwords do not match.";
+
+        if (Object.keys(newErrors).length > 0) {
+            Object.entries(newErrors).forEach(([field, message]) =>
+                setError(field, message),
+            );
+            return false;
+        }
+        return true;
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (!validate()) {
+            toast.error("Please filled up the highlighted fields.");
+            return;
+        }
+
+        post("/users", {
+            onSuccess: () => {
+                reset();
+                setOpen(false);
+                toast.success("User created successfully.");
+            },
+            onError: () => {
+                toast.error("Something went wrong. Please check the form.");
+            },
+        });
+    };
+
+    const handleSearch = (e) => {
+        const value = e.target.value;
+
+        setQuery(value);
+
+        router.get(
+            "/users",
+            {
+                search: value,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
         );
-    }, [query]);
+    };
+
+    const handleDelete = (user) => {
+        setUserToDelete(user);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (!userToDelete) return;
+
+        router.delete(`/users/${userToDelete.id}`, {
+            preserveScroll: true,
+
+            onSuccess: () => {
+                toast.success("User deleted successfully.");
+                setDeleteDialogOpen(false);
+                setUserToDelete(null);
+            },
+
+            onError: () => {
+                toast.error("Failed to delete user. Please try again.");
+            },
+        });
+    };
 
     return (
         <AppLayout>
             <div className="p-4 sm:p-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                    <div>
-                        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
-                            Users
-                        </h1>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                            Manage drivers and staff accounts across your
-                            offices.
-                        </p>
+                    <div className="flex items-start ">
+                        <PageHeader
+                            title="Manage Users"
+                            description="Add new users, manage accounts, and assign user roles."
+                        />
                     </div>
                     <button
                         onClick={() => setOpen(true)}
@@ -120,82 +204,107 @@ export default function Users() {
                         />
                         <input
                             value={query}
-                            onChange={(e) => setQuery(e.target.value)}
+                            onChange={handleSearch}
                             type="text"
-                            placeholder="Search by name, office, role..."
+                            placeholder="Search by name or role..."
                             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
                         />
                     </div>
                     <p className="text-xs text-slate-400 dark:text-slate-500 ml-auto hidden sm:block">
-                        {filtered.length} of {MOCK_USERS.length} users
+                        Showing {users.from ?? 0}–{users.to ?? 0} of{" "}
+                        {users.total ?? 0} users
                     </p>
                 </div>
 
                 {/* Table */}
                 <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-left">
+                        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-left table-fixed">
                             <thead className="bg-slate-50 dark:bg-slate-900/40">
                                 <tr>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-10 px-4 py-3">
+                                        <input
+                                            type="checkbox"
+                                            className="rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500/30 dark:border-slate-600 dark:bg-slate-800"
+                                        />
+                                    </th>
+                                    <th className="w-12 px-2 py-3"></th>
+                                    <th className="w-32 px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                        Username
+                                    </th>
+                                    <th className="w-30 px-22 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                         Name
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                                        Office Assignment
-                                    </th>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                         Role
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                         Status
                                     </th>
+                                    {/* no fixed width here — this column absorbs the leftover space */}
                                     <th className="px-5 py-3">
                                         <span className="sr-only">Actions</span>
                                     </th>
                                 </tr>
                             </thead>
+
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
-                                {filtered.map((user) => (
+                                {users.data.map((user) => (
                                     <tr
                                         key={user.id}
                                         className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
                                     >
-                                        <td className="px-5 py-3.5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
-                                                    {initials(user.name)}
-                                                </div>
-                                                <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                                    {user.name}
-                                                </span>
+                                        <td className="w-10 px-4 py-3.5">
+                                            <input
+                                                type="checkbox"
+                                                className="rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500/30 dark:border-slate-600 dark:bg-slate-800"
+                                            />
+                                        </td>
+                                        <td className="w-12 px-2 py-3.5">
+                                            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
+                                                {initials(
+                                                    `${user.first_name} ${user.middle_name ?? ""} ${user.last_name}`,
+                                                )}
                                             </div>
                                         </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400">
-                                            {user.office}
+                                        <td className="w-32 px-6 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate">
+                                            {user.username}
                                         </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400">
+                                        <td className="px-5 py-3.5">
+                                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                                                {user.first_name}{" "}
+                                                {user.middle_name
+                                                    ? `${user.middle_name} `
+                                                    : ""}
+                                                {user.last_name}
+                                            </p>
+                                        </td>
+                                        <td className="w-28 px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate">
                                             {user.role}
                                         </td>
-                                        <td className="px-5 py-3.5">
+                                        <td className="w-28 px-5 py-3.5">
                                             <StatusBadge status={user.status} />
                                         </td>
-                                        <td className="px-5 py-3.5">
+                                        <td className="w-24 px-5 py-3.5">
                                             <div className="flex justify-end gap-1.5">
                                                 <button
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
-                                                    aria-label={`Edit ${user.name}`}
+                                                    aria-label={`Edit ${user.id}`}
                                                 >
                                                     <Pencil size={15} />
                                                 </button>
                                                 <button
+                                                    onClick={() =>
+                                                        handleDelete(user)
+                                                    }
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                                                    aria-label={`Delete ${user.name}`}
+                                                    aria-label={`Delete ${user.first_name} ${user.last_name}`}
                                                 >
                                                     <Trash2 size={15} />
                                                 </button>
                                                 <button
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors"
-                                                    aria-label={`More actions for ${user.name}`}
+                                                    aria-label={`More actions for ${user.id}`}
                                                 >
                                                     <MoreHorizontal size={15} />
                                                 </button>
@@ -204,10 +313,10 @@ export default function Users() {
                                     </tr>
                                 ))}
 
-                                {filtered.length === 0 && (
+                                {users.data.length === 0 && (
                                     <tr>
                                         <td
-                                            colSpan={5}
+                                            colSpan={7}
                                             className="px-5 py-12 text-center"
                                         >
                                             <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -223,14 +332,16 @@ export default function Users() {
                             </tbody>
                         </table>
                     </div>
+
+                    <Pagination links={users.links} />
                 </div>
             </div>
 
             <Drawer
                 open={open}
                 onClose={() => setOpen(false)}
-                title="Add New Driver"
-                subtitle="Fill in the details of the new driver below."
+                title="Add New User"
+                subtitle="Fill in the details of the new user below."
                 footer={
                     <div className="flex justify-end gap-2">
                         <button
@@ -239,8 +350,13 @@ export default function Users() {
                         >
                             Cancel
                         </button>
-                        <button className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20">
-                            Save
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={processing}
+                            className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20 disabled:opacity-50"
+                        >
+                            {processing ? "Saving..." : "Save"}
                         </button>
                     </div>
                 }
@@ -249,48 +365,156 @@ export default function Users() {
                     Details
                 </p>
 
-                <div className="grid grid-cols-2 gap-x-3">
-                    <Field label="First Name" htmlFor="first_name">
+                <form action="" onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-2 gap-x-3">
+                        <Field label="First Name" htmlFor="first_name">
+                            <TextInput
+                                id="first_name"
+                                name="first_name"
+                                placeholder="First name"
+                                value={data.first_name}
+                                onChange={(e) =>
+                                    setData("first_name", e.target.value)
+                                }
+                            />
+                            {errors.first_name && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.first_name}
+                                </p>
+                            )}
+                        </Field>
+                        <Field label="Last Name" htmlFor="last_name">
+                            <TextInput
+                                id="last_name"
+                                name="last_name"
+                                placeholder="Last name"
+                                value={data.last_name}
+                                onChange={(e) =>
+                                    setData("last_name", e.target.value)
+                                }
+                            />
+                            {errors.last_name && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.last_name}
+                                </p>
+                            )}
+                        </Field>
+                    </div>
+
+                    <Field label="Middle Name" htmlFor="middle_name">
                         <TextInput
-                            id="first_name"
-                            name="first_name"
-                            placeholder="First name"
+                            id="middle_name"
+                            name="middle_name"
+                            placeholder="Middle name"
+                            value={data.middle_name}
+                            onChange={(e) =>
+                                setData("middle_name", e.target.value)
+                            }
                         />
+                        {errors.middle_name && (
+                            <p className="mt-1 text-xs text-red-500">
+                                {errors.middle_name}
+                            </p>
+                        )}
                     </Field>
-                    <Field label="Last Name" htmlFor="last_name">
+
+                    <Field label="Username" htmlFor="username">
                         <TextInput
-                            id="last_name"
-                            name="last_name"
-                            placeholder="Last name"
+                            id="username"
+                            name="username"
+                            placeholder="Username"
+                            value={data.username}
+                            onChange={(e) =>
+                                setData("username", e.target.value)
+                            }
                         />
+                        {errors.username && (
+                            <p className="mt-1 text-xs text-red-500">
+                                {errors.username}
+                            </p>
+                        )}
                     </Field>
-                </div>
 
-                <Field label="Middle Name" htmlFor="middle_name">
-                    <TextInput
-                        id="middle_name"
-                        name="middle_name"
-                        placeholder="Middle name"
-                    />
-                </Field>
+                    <Field label="Role" htmlFor="role">
+                        <SelectInput
+                            id="role"
+                            name="role"
+                            placeholder="Select role"
+                            value={data.role}
+                            onChange={(e) => setData("role", e.target.value)}
+                        >
+                            <option value="">Select role</option>
+                            <option value="admin">Admin</option>
+                            <option value="staff">Staff</option>
+                            <option value="user">User</option>
+                        </SelectInput>
+                        {errors.role && (
+                            <p className="mt-1 text-xs text-red-500">
+                                {errors.role}
+                            </p>
+                        )}
+                    </Field>
 
-                <Field label="Office Assignment" htmlFor="office">
-                    <SelectInput
-                        id="office"
-                        name="office"
-                        placeholder="Select office"
-                    />
-                </Field>
+                    <Field label="Password" htmlFor="password">
+                        <PasswordInput
+                            id="password"
+                            name="password"
+                            placeholder="Enter password"
+                            autoComplete="new-password"
+                            value={data.password}
+                            onChange={(e) =>
+                                setData("password", e.target.value)
+                            }
+                        />
+                        {errors.password && (
+                            <p className="mt-1 text-xs text-red-500">
+                                {errors.password}
+                            </p>
+                        )}
+                    </Field>
 
-                <Field label="License Expiry Date" htmlFor="license_expiry">
-                    <TextInput
-                        id="license_expiry"
-                        name="license_expiry"
-                        type="date"
-                        placeholder="License expiry date"
-                    />
-                </Field>
+                    <Field
+                        label="Confirm Password"
+                        htmlFor="password_confirmation"
+                    >
+                        <TextInput
+                            id="password_confirmation"
+                            name="password_confirmation"
+                            type="password"
+                            placeholder="Confirm password"
+                            value={data.password_confirmation}
+                            onChange={(e) =>
+                                setData("password_confirmation", e.target.value)
+                            }
+                        />
+                        {errors.password_confirmation && (
+                            <p className="mt-1 text-xs text-red-500">
+                                {errors.password_confirmation}
+                            </p>
+                        )}
+                    </Field>
+                </form>
             </Drawer>
+            <ConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={(open) => {
+                    setDeleteDialogOpen(open);
+
+                    if (!open) {
+                        setUserToDelete(null);
+                    }
+                }}
+                title="Delete user?"
+                description={
+                    userToDelete
+                        ? `Delete ${userToDelete.first_name} ${userToDelete.last_name}? This can be undone by an admin.`
+                        : ""
+                }
+                confirmText="Delete"
+                cancelText="Cancel"
+                destructive
+                onConfirm={confirmDelete}
+            />
         </AppLayout>
     );
 }

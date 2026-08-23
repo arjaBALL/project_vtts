@@ -1,4 +1,5 @@
-import { useId } from "react";
+import { useId, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 /**
  * Shared visual styles for all form controls.
@@ -181,17 +182,36 @@ export function SelectInput({
         <div className="flex flex-col gap-1.5">
             <FieldLabel id={inputId} label={label} required={required} />
 
-            <select
-                id={inputId}
-                disabled={disabled}
-                required={required}
-                aria-invalid={!!error}
-                aria-describedby={errorId}
-                {...props}
-                className={fieldClasses({ error, disabled, className })}
-            >
-                {children}
-            </select>
+            <div className="relative">
+                <select
+                    id={inputId}
+                    disabled={disabled}
+                    required={required}
+                    aria-invalid={!!error}
+                    aria-describedby={errorId}
+                    {...props}
+                    className={fieldClasses({
+                        error,
+                        disabled,
+                        className: `appearance-none pr-10 ${className ?? ""}`,
+                    })}
+                >
+                    {children}
+                </select>
+
+                <svg
+                    className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                >
+                    <path
+                        fillRule="evenodd"
+                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                        clipRule="evenodd"
+                    />
+                </svg>
+            </div>
 
             <FieldError id={errorId} error={error} />
         </div>
@@ -268,6 +288,63 @@ export function TextArea({
                     extra: "resize-y",
                 })}
             />
+
+            <FieldError id={errorId} error={error} />
+        </div>
+    );
+}
+
+export function PasswordInput({
+    label,
+    error,
+    className = "",
+    id,
+    required,
+    disabled,
+    ...props
+}) {
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
+    const errorId = error ? `${inputId}-error` : undefined;
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    return (
+        <div className="flex flex-col gap-1.5">
+            <FieldLabel id={inputId} label={label} required={required} />
+
+            <div className="relative">
+                <input
+                    id={inputId}
+                    type={showPassword ? "text" : "password"}
+                    disabled={disabled}
+                    required={required}
+                    aria-invalid={!!error}
+                    aria-describedby={errorId}
+                    {...props}
+                    className={fieldClasses({
+                        error,
+                        disabled,
+                        className: `pr-10 ${className}`,
+                    })}
+                />
+
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={disabled}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                    }
+                >
+                    {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                    ) : (
+                        <Eye className="h-5 w-5" />
+                    )}
+                </button>
+            </div>
 
             <FieldError id={errorId} error={error} />
         </div>

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,9 +42,15 @@ Route::get('/drivers', function () {
     return Inertia::render('DataManagement/Drivers');
 });
 
-Route::get('/users', function () {
-    return Inertia::render('DataManagement/Users');
-});
+// Route::middleware(['auth'])->group(function () {
+
+//     // ...other authenticated routes
+// });
+
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
 
 Route::get('/vehicles', function () {
     return Inertia::render('DataManagement/Vehicles');
