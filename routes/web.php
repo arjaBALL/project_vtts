@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OfficeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,24 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Main/Dashboard');
 });
+
+// USER ROUTES
+
+// Route::middleware(['auth'])->group(function () {
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+// });
+
+//OFFICE ROUTES
+
+// Route::middleware(['auth'])->group(function () {
+Route::get('/offices', [OfficeController::class, 'index'])->name('offices.index');
+Route::post('/offices', [OfficeController::class, 'store'])->name('offices.store');
+Route::put('/offices/{office}', [OfficeController::class, 'update'])->name('offices.update');
+Route::delete('/offices/{office}', [OfficeController::class, 'destroy'])->name('offices.destroy');
+// });
 
 // * Requester Pages
 Route::get('/request-trip-ticket', function () {
@@ -42,15 +61,9 @@ Route::get('/drivers', function () {
     return Inertia::render('DataManagement/Drivers');
 });
 
-// Route::middleware(['auth'])->group(function () {
 
-//     // ...other authenticated routes
-// });
 
-Route::get('/users', [UserController::class, 'index'])->name('users.index');
-Route::post('/users', [UserController::class, 'store'])->name('users.store');
-Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
 
 
 Route::get('/vehicles', function () {
