@@ -27,4 +27,10 @@ class StoreUserRequest extends FormRequest
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'username.unique' => 'This username is already taken.',
+        ];
+    }
 }

@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('last_name');
             $table->string('password');
 
-            $table->enum('role', ['admin', 'staff', 'user'])->default('user');
+            $table->enum('role', ['admin', 'staff', 'user', 'driver'])->default('user');
             $table->enum('status', ['active', 'inactive'])->default('active');
 
             $table->rememberToken();

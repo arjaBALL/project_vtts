@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\User\StoreUserRequest;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Services\User\UserService;
 use Illuminate\Http\Request;
@@ -58,6 +59,40 @@ class UserController extends Controller
             ->route('users.index')
             ->with('success', 'User created successfully.');
     }
+
+    public function update(Request $request, User $user)
+        {
+            $validated = $request->validate([
+                'username' => [
+                    'required',
+                    'string',
+                    'min:3',
+                    'max:255',
+                    'unique:users,username,' . $user->id,
+                ],
+                'first_name' => ['required', 'string', 'max:255'],
+                'middle_name' => ['nullable', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'role' => ['required', 'string', 'in:admin,staff,user'],
+                'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            ]);
+
+            $user->username = $validated['username'];
+            $user->first_name = $validated['first_name'];
+            $user->middle_name = $validated['middle_name'] ?? null;
+            $user->last_name = $validated['last_name'];
+            $user->role = $validated['role'];
+
+            if (!empty($validated['password'])) {
+                $user->password = Hash::make($validated['password']);
+            }
+
+            $user->save();
+
+            return redirect()
+                ->route('users.index')
+                ->with('success', 'User updated successfully.');
+        }
 
     public function destroy(User $user)
     {

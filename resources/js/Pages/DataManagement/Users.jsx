@@ -7,6 +7,11 @@ import { PageHeader } from "../../components/ui/PageHeader";
 import Pagination from "../../components/ui/Pagination";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import {
     UserPlus2,
     Search,
     MoreHorizontal,
@@ -64,6 +69,7 @@ function Field({ label, htmlFor, children }) {
 
 export default function Users({ users, filters }) {
     const [open, setOpen] = useState(false);
+    const [userToEdit, setUserToEdit] = useState(null);
     const [query, setQuery] = useState(filters?.search ?? "");
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
@@ -99,11 +105,26 @@ export default function Users({ users, filters }) {
         else if (data.username.trim().length < 3)
             newErrors.username = "Username must be at least 3 characters.";
         if (!data.role) newErrors.role = "Please select a role.";
-        if (!data.password) newErrors.password = "Password is required.";
-        else if (data.password.length < 8)
-            newErrors.password = "Password must be at least 8 characters.";
-        if (data.password !== data.password_confirmation)
-            newErrors.password_confirmation = "Passwords do not match.";
+        if (!userToEdit) {
+            if (!data.password) {
+                newErrors.password = "Password is required.";
+            } else if (data.password.length < 8) {
+                newErrors.password = "Password must be at least 8 characters.";
+            }
+
+            if (data.password !== data.password_confirmation) {
+                newErrors.password_confirmation = "Passwords do not match.";
+            }
+        } else {
+            // Password is optional when editing
+            if (data.password && data.password.length < 8) {
+                newErrors.password = "Password must be at least 8 characters.";
+            }
+
+            if (data.password && data.password !== data.password_confirmation) {
+                newErrors.password_confirmation = "Passwords do not match.";
+            }
+        }
 
         if (Object.keys(newErrors).length > 0) {
             Object.entries(newErrors).forEach(([field, message]) =>
@@ -114,24 +135,59 @@ export default function Users({ users, filters }) {
         return true;
     };
 
+    const handleEdit = (user) => {
+        setUserToEdit(user);
+
+        setData({
+            username: user.username ?? "",
+            first_name: user.first_name ?? "",
+            middle_name: user.middle_name ?? "",
+            last_name: user.last_name ?? "",
+            role: user.role ?? "",
+            password: "",
+            password_confirmation: "",
+        });
+
+        clearErrors();
+        setOpen(true);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
         if (!validate()) {
-            toast.error("Please filled up the highlighted fields.");
+            toast.error("Please fill up the highlighted fields.");
             return;
         }
 
-        post("/users", {
-            onSuccess: () => {
-                reset();
-                setOpen(false);
-                toast.success("User created successfully.");
-            },
-            onError: () => {
-                toast.error("Something went wrong. Please check the form.");
-            },
-        });
+        if (userToEdit) {
+            router.put(`/users/${userToEdit.id}`, data, {
+                onSuccess: () => {
+                    reset();
+                    setUserToEdit(null);
+                    setOpen(false);
+
+                    toast.success("User updated successfully.");
+                },
+
+                onError: () => {
+                    toast.error("Something went wrong. Please check the form.");
+                },
+            });
+        } else {
+            post("/users", {
+                onSuccess: () => {
+                    reset();
+                    setOpen(false);
+
+                    toast.success("User created successfully.");
+                },
+
+                onError: () => {
+                    toast.error("Something went wrong. Please check the form.");
+                },
+            });
+        }
     };
 
     const handleSearch = (e) => {
@@ -288,6 +344,9 @@ export default function Users({ users, filters }) {
                                         <td className="w-24 px-5 py-3.5">
                                             <div className="flex justify-end gap-1.5">
                                                 <button
+                                                    onClick={() =>
+                                                        handleEdit(user)
+                                                    }
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
                                                     aria-label={`Edit ${user.id}`}
                                                 >
@@ -302,12 +361,52 @@ export default function Users({ users, filters }) {
                                                 >
                                                     <Trash2 size={15} />
                                                 </button>
-                                                <button
-                                                    className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors"
-                                                    aria-label={`More actions for ${user.id}`}
-                                                >
-                                                    <MoreHorizontal size={15} />
-                                                </button>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <button
+                                                            className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors"
+                                                            aria-label={`More actions for ${user.id}`}
+                                                        >
+                                                            <MoreHorizontal
+                                                                size={15}
+                                                            />
+                                                        </button>
+                                                    </PopoverTrigger>
+
+                                                    <PopoverContent
+                                                        align="end"
+                                                        className="w-40 p-1"
+                                                    >
+                                                        <button
+                                                            className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                            onClick={() =>
+                                                                handleEdit(user)
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
+
+                                                        <button
+                                                            className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                            onClick={() =>
+                                                                handleView(user)
+                                                            }
+                                                        >
+                                                            View
+                                                        </button>
+
+                                                        <button
+                                                            className="w-full rounded-md px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    user,
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </PopoverContent>
+                                                </Popover>
                                             </div>
                                         </td>
                                     </tr>
@@ -339,9 +438,18 @@ export default function Users({ users, filters }) {
 
             <Drawer
                 open={open}
-                onClose={() => setOpen(false)}
-                title="Add New User"
-                subtitle="Fill in the details of the new user below."
+                onClose={() => {
+                    setOpen(false);
+                    setUserToEdit(null);
+                    reset();
+                    clearErrors();
+                }}
+                title={userToEdit ? "Edit User" : "Add New User"}
+                subtitle={
+                    userToEdit
+                        ? "Update the user's information below."
+                        : "Fill in the details of the new user below."
+                }
                 footer={
                     <div className="flex justify-end gap-2">
                         <button
@@ -356,7 +464,11 @@ export default function Users({ users, filters }) {
                             disabled={processing}
                             className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20 disabled:opacity-50"
                         >
-                            {processing ? "Saving..." : "Save"}
+                            {processing
+                                ? "Saving..."
+                                : userToEdit
+                                  ? "Update"
+                                  : "Save"}
                         </button>
                     </div>
                 }
@@ -455,44 +567,53 @@ export default function Users({ users, filters }) {
                         )}
                     </Field>
 
-                    <Field label="Password" htmlFor="password">
-                        <PasswordInput
-                            id="password"
-                            name="password"
-                            placeholder="Enter password"
-                            autoComplete="new-password"
-                            value={data.password}
-                            onChange={(e) =>
-                                setData("password", e.target.value)
-                            }
-                        />
-                        {errors.password && (
-                            <p className="mt-1 text-xs text-red-500">
-                                {errors.password}
-                            </p>
-                        )}
-                    </Field>
+                    {!userToEdit && (
+                        <>
+                            <Field label="Password" htmlFor="password">
+                                <PasswordInput
+                                    id="password"
+                                    name="password"
+                                    placeholder="Enter password"
+                                    autoComplete="new-password"
+                                    value={data.password}
+                                    onChange={(e) =>
+                                        setData("password", e.target.value)
+                                    }
+                                />
 
-                    <Field
-                        label="Confirm Password"
-                        htmlFor="password_confirmation"
-                    >
-                        <TextInput
-                            id="password_confirmation"
-                            name="password_confirmation"
-                            type="password"
-                            placeholder="Confirm password"
-                            value={data.password_confirmation}
-                            onChange={(e) =>
-                                setData("password_confirmation", e.target.value)
-                            }
-                        />
-                        {errors.password_confirmation && (
-                            <p className="mt-1 text-xs text-red-500">
-                                {errors.password_confirmation}
-                            </p>
-                        )}
-                    </Field>
+                                {errors.password && (
+                                    <p className="mt-1 text-xs text-red-500">
+                                        {errors.password}
+                                    </p>
+                                )}
+                            </Field>
+
+                            <Field
+                                label="Confirm Password"
+                                htmlFor="password_confirmation"
+                            >
+                                <TextInput
+                                    id="password_confirmation"
+                                    name="password_confirmation"
+                                    type="password"
+                                    placeholder="Confirm password"
+                                    value={data.password_confirmation}
+                                    onChange={(e) =>
+                                        setData(
+                                            "password_confirmation",
+                                            e.target.value,
+                                        )
+                                    }
+                                />
+
+                                {errors.password_confirmation && (
+                                    <p className="mt-1 text-xs text-red-500">
+                                        {errors.password_confirmation}
+                                    </p>
+                                )}
+                            </Field>
+                        </>
+                    )}
                 </form>
             </Drawer>
             <ConfirmDialog
