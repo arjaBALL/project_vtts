@@ -16,4 +16,6 @@ class Office extends Authenticable
         'office',
         'abbreviation'
     ];
+
+   
 }

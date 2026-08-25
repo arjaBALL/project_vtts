@@ -15,6 +15,7 @@ class UserService
                 'first_name' => $data['first_name'],
                 'middle_name' => $data['middle_name'] ?? null,
                 'last_name' => $data['last_name'],
+                'office_id' => $data['office_id'],
                 'password' => $data['password'], // auto-hashed via model cast
                 'role' => $data['role'],
                 'status' => 'active',

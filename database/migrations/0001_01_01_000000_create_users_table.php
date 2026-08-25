@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('middle_name')->nullable();
             $table->string('last_name');
             $table->string('password');
-
+            $table->foreignId('office_id')->constrained('offices');
             $table->enum('role', ['admin', 'staff', 'user', 'driver'])->default('user');
             $table->enum('status', ['active', 'inactive'])->default('active');
 

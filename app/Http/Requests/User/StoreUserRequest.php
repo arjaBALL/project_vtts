@@ -23,6 +23,7 @@ class StoreUserRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
+            'office_id' => ['required', 'integer', 'exists:offices,id'],
             'role' => ['required', 'in:admin,staff,user'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];

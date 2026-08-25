@@ -19,6 +19,7 @@ class User extends Authenticable
         'first_name',
         'middle_name',
         'password',
+        'office_id',
         'role',
         'status'
     ];

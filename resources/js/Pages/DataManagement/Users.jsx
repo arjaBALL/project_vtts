@@ -67,7 +67,7 @@ function Field({ label, htmlFor, children }) {
     );
 }
 
-export default function Users({ users, filters }) {
+export default function Users({ users, offices, filters }) {
     const [open, setOpen] = useState(false);
     const [userToEdit, setUserToEdit] = useState(null);
     const [query, setQuery] = useState(filters?.search ?? "");
@@ -88,7 +88,9 @@ export default function Users({ users, filters }) {
         first_name: "",
         middle_name: "",
         last_name: "",
+        office_id: "",
         role: "",
+        status: "active",
         password: "",
         password_confirmation: "",
     });
@@ -104,6 +106,9 @@ export default function Users({ users, filters }) {
         if (!data.username.trim()) newErrors.username = "Username is required.";
         else if (data.username.trim().length < 3)
             newErrors.username = "Username must be at least 3 characters.";
+        if (!data.office_id) {
+            newErrors.office_id = "Please select an office.";
+        }
         if (!data.role) newErrors.role = "Please select a role.";
         if (!userToEdit) {
             if (!data.password) {
@@ -143,7 +148,9 @@ export default function Users({ users, filters }) {
             first_name: user.first_name ?? "",
             middle_name: user.middle_name ?? "",
             last_name: user.last_name ?? "",
+            office_id: user.office_id ?? "",
             role: user.role ?? "",
+            status: user.status ?? "active",
             password: "",
             password_confirmation: "",
         });
@@ -275,30 +282,44 @@ export default function Users({ users, filters }) {
                 {/* Table */}
                 <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-left table-fixed">
+                        <table className="min-w-full table-fixed divide-y divide-slate-200 dark:divide-slate-700 text-center">
+                            <colgroup>
+                                <col className="w-10" /> {/* checkbox */}
+                                <col className="w-12" /> {/* avatar */}
+                                <col className="w-32" /> {/* username */}
+                                <col />{" "}
+                                {/* name — flexible, fills remaining space */}
+                                <col className="w-20" /> {/* office */}
+                                <col className="w-28" /> {/* role */}
+                                <col className="w-28" /> {/* status */}
+                                <col className="w-24" /> {/* actions */}
+                            </colgroup>
+
                             <thead className="bg-slate-50 dark:bg-slate-900/40">
                                 <tr>
-                                    <th className="w-10 px-4 py-3">
+                                    <th className="px-4 py-3 align-middle">
                                         <input
                                             type="checkbox"
-                                            className="rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500/30 dark:border-slate-600 dark:bg-slate-800"
+                                            className="rounded border-slate-300 ..."
                                         />
                                     </th>
-                                    <th className="w-12 px-2 py-3"></th>
-                                    <th className="w-32 px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-2 py-3 align-middle"></th>
+                                    <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Username
                                     </th>
-                                    <th className="w-30 px-22 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Name
                                     </th>
-                                    <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
+                                        Office
+                                    </th>
+                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Role
                                     </th>
-                                    <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Status
                                     </th>
-                                    {/* no fixed width here — this column absorbs the leftover space */}
-                                    <th className="px-5 py-3">
+                                    <th className="px-5 py-3 align-middle">
                                         <span className="sr-only">Actions</span>
                                     </th>
                                 </tr>
@@ -310,23 +331,23 @@ export default function Users({ users, filters }) {
                                         key={user.id}
                                         className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
                                     >
-                                        <td className="w-10 px-4 py-3.5">
+                                        <td className="px-4 py-3.5 align-middle">
                                             <input
                                                 type="checkbox"
-                                                className="rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500/30 dark:border-slate-600 dark:bg-slate-800"
+                                                className="rounded border-slate-300 ..."
                                             />
                                         </td>
-                                        <td className="w-12 px-2 py-3.5">
-                                            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
+                                        <td className="px-2 py-3.5 align-middle">
+                                            <div className="w-8 h-8 mx-auto rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
                                                 {initials(
                                                     `${user.first_name} ${user.middle_name ?? ""} ${user.last_name}`,
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="w-32 px-6 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate">
+                                        <td className="px-3 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle">
                                             {user.username}
                                         </td>
-                                        <td className="px-5 py-3.5">
+                                        <td className="px-5 py-3.5 align-middle">
                                             <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
                                                 {user.first_name}{" "}
                                                 {user.middle_name
@@ -335,14 +356,17 @@ export default function Users({ users, filters }) {
                                                 {user.last_name}
                                             </p>
                                         </td>
-                                        <td className="w-28 px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate">
+                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle">
+                                            {user.abbreviation}
+                                        </td>
+                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle">
                                             {user.role}
                                         </td>
-                                        <td className="w-28 px-5 py-3.5">
+                                        <td className="px-5 py-3.5 align-middle">
                                             <StatusBadge status={user.status} />
                                         </td>
-                                        <td className="w-24 px-5 py-3.5">
-                                            <div className="flex justify-end gap-1.5">
+                                        <td className="px-5 py-3.5 align-middle">
+                                            <div className="flex justify-center gap-1.5">
                                                 <button
                                                     onClick={() =>
                                                         handleEdit(user)
@@ -385,7 +409,6 @@ export default function Users({ users, filters }) {
                                                         >
                                                             Edit
                                                         </button>
-
                                                         <button
                                                             className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
                                                             onClick={() =>
@@ -394,7 +417,6 @@ export default function Users({ users, filters }) {
                                                         >
                                                             View
                                                         </button>
-
                                                         <button
                                                             className="w-full rounded-md px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
                                                             onClick={() =>
@@ -415,7 +437,7 @@ export default function Users({ users, filters }) {
                                 {users.data.length === 0 && (
                                     <tr>
                                         <td
-                                            colSpan={7}
+                                            colSpan={8}
                                             className="px-5 py-12 text-center"
                                         >
                                             <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -547,6 +569,32 @@ export default function Users({ users, filters }) {
                         )}
                     </Field>
 
+                    <Field label="Office" htmlFor="office">
+                        <SelectInput
+                            id="office_id"
+                            name="office_id"
+                            placeholder="Select office"
+                            value={data.office_id}
+                            onChange={(e) =>
+                                setData("office_id", e.target.value)
+                            }
+                        >
+                            <option value="">Select office</option>
+
+                            {offices.map((office) => (
+                                <option key={office.id} value={office.id}>
+                                    {office.office} ({office.abbreviation})
+                                </option>
+                            ))}
+                        </SelectInput>
+
+                        {errors.office_id && (
+                            <p className="mt-1 text-xs text-red-500">
+                                {errors.office_id}
+                            </p>
+                        )}
+                    </Field>
+
                     <Field label="Role" htmlFor="role">
                         <SelectInput
                             id="role"
@@ -559,6 +607,7 @@ export default function Users({ users, filters }) {
                             <option value="admin">Admin</option>
                             <option value="staff">Staff</option>
                             <option value="user">User</option>
+                            <option value="user">Driver</option>
                         </SelectInput>
                         {errors.role && (
                             <p className="mt-1 text-xs text-red-500">
@@ -566,6 +615,26 @@ export default function Users({ users, filters }) {
                             </p>
                         )}
                     </Field>
+                    {userToEdit && (
+                        <Field label="Status" htmlFor="status">
+                            <SelectInput
+                                id="status"
+                                name="status"
+                                value={data.status}
+                                onChange={(e) =>
+                                    setData("status", e.target.value)
+                                }
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </SelectInput>
+                            {errors.status && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.status}
+                                </p>
+                            )}
+                        </Field>
+                    )}
 
                     {!userToEdit && (
                         <>
