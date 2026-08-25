@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OfficeController;
+use App\Http\Controllers\DriverController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,14 @@ Route::post('/offices', [OfficeController::class, 'store'])->name('offices.store
 Route::put('/offices/{office}', [OfficeController::class, 'update'])->name('offices.update');
 Route::delete('/offices/{office}', [OfficeController::class, 'destroy'])->name('offices.destroy');
 // });
+
+// DRIVER ROUTES
+
+// DRIVER ROUTES
+Route::get('/drivers', [DriverController::class, 'index'])->name('drivers.index');
+Route::post('/drivers', [DriverController::class, 'store'])->name('drivers.store');
+Route::put('/drivers/{driver}', [DriverController::class, 'update'])->name('drivers.update');
+Route::delete('/drivers/{driver}', [DriverController::class, 'destroy'])->name('drivers.destroy');
 
 // * Requester Pages
 Route::get('/request-trip-ticket', function () {

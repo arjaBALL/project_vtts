@@ -12,10 +12,12 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function __construct(
-    protected UserService $service,
-    protected OfficeService $officeService
-) {
+    public function __construct
+        (
+            protected UserService $service,
+            protected OfficeService $officeService
+        ) 
+    {
 }
   public function index(Request $request)
     {
@@ -23,6 +25,7 @@ class UserController extends Controller
 
         $users = User::query()
             ->join('offices', 'users.office_id', '=', 'offices.id')
+            //  ->where('users.status', 'active')
             ->select([
                 'users.id',
                 'users.username',

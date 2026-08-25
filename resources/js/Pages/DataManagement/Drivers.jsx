@@ -1,6 +1,7 @@
 import AppLayout from "../../Layouts/AppLayout";
 import Drawer from "../../components/ui/Drawer";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useForm, router } from "@inertiajs/react";
 import {
     UserRoundKey,
     Trash2,
@@ -9,31 +10,6 @@ import {
     MoreHorizontal,
 } from "lucide-react";
 import { TextInput, SelectInput } from "../../components/ui/Inputs";
-
-// TODO: replace with real data from the backend (Inertia props / fetch)
-const MOCK_DRIVERS = [
-    {
-        id: 1,
-        name: "Arjay Santos",
-        office: "Main Office",
-        licenseExpiry: "2025-12-31",
-        status: "Active",
-    },
-    {
-        id: 2,
-        name: "Maria Cruz",
-        office: "North Branch",
-        licenseExpiry: "2026-03-15",
-        status: "Active",
-    },
-    {
-        id: 3,
-        name: "Pedro Reyes",
-        office: "Main Office",
-        licenseExpiry: "2025-09-01",
-        status: "Expired",
-    },
-];
 
 const STATUS_STYLES = {
     Active: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/30",
@@ -78,17 +54,59 @@ function Field({ label, htmlFor, children }) {
     );
 }
 
-export default function Drivers() {
+export default function Drivers({ drivers, filters }) {
     const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState("");
+    const [userToEdit, setUserToEdit] = useState(null);
+    const [query, setQuery] = useState(filters?.search ?? "");
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-    const filtered = useMemo(() => {
-        const q = query.trim().toLowerCase();
-        if (!q) return MOCK_DRIVERS;
-        return MOCK_DRIVERS.filter((d) =>
-            [d.name, d.office].some((v) => v.toLowerCase().includes(q)),
+    const {
+        data,
+        post,
+        setData,
+        processing,
+        errors,
+        setError,
+        clearErrors,
+        reset,
+    } = useForm({
+        user_id: "",
+        license_number: "",
+        license_expiry: "",
+    });
+
+    const driverData = drivers?.data ?? [];
+
+    const validate = () => {
+        clearErrors();
+        const newErrors = {};
+
+        if (!data.user_id.trim()) newErrors.user_id = "User ID is missing.";
+        if (!data.license_number.trim())
+            newErrors.license_number = "License number is required.";
+        if (!data.license_expiry.trim())
+            newErrors.license_expiry = "license expiry is required.";
+
+        return true;
+    };
+
+    const handleSearch = (e) => {
+        const value = e.target.value;
+
+        setQuery(value);
+
+        router.get(
+            "/drivers",
+            {
+                search: value,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
         );
-    }, [query]);
+    };
 
     return (
         <AppLayout>
@@ -122,14 +140,15 @@ export default function Drivers() {
                         />
                         <input
                             value={query}
-                            onChange={(e) => setQuery(e.target.value)}
+                            onChange={handleSearch}
                             type="text"
                             placeholder="Search by name or office..."
                             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
                         />
                     </div>
                     <p className="text-xs text-slate-400 dark:text-slate-500 ml-auto hidden sm:block">
-                        {filtered.length} of {MOCK_DRIVERS.length} drivers
+                        Showing {drivers?.from ?? 0}–{drivers?.to ?? 0} of{" "}
+                        {drivers?.total ?? 0} drivers
                     </p>
                 </div>
 
@@ -146,10 +165,10 @@ export default function Drivers() {
                                         Office Assignment
                                     </th>
                                     <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                                        License Expiry
+                                        License No.
                                     </th>
                                     <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                                        Status
+                                        License Expiry
                                     </th>
                                     <th className="px-5 py-3">
                                         <span className="sr-only">Actions</span>
@@ -157,49 +176,48 @@ export default function Drivers() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
-                                {filtered.map((driver) => (
+                                {driverData.map((driver) => (
                                     <tr
                                         key={driver.id}
                                         className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
                                     >
                                         <td className="px-5 py-3.5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
-                                                    {initials(driver.name)}
-                                                </div>
-                                                <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                                    {driver.name}
-                                                </span>
+                                            <div className="w-8 h-8 mx-auto rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
+                                                {initials(
+                                                    `${driver.first_name} ${driver.middle_name ?? ""} ${driver.last_name}`,
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                                            {driver.office}
-                                        </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                                            {driver.licenseExpiry}
+                                            {driver.abbreviation}
                                         </td>
                                         <td className="px-5 py-3.5">
                                             <StatusBadge
-                                                status={driver.status}
+                                                status={driver.license_number}
+                                            />
+                                        </td>
+                                        <td className="px-5 py-3.5">
+                                            <StatusBadge
+                                                status={driver.license_expiry}
                                             />
                                         </td>
                                         <td className="px-5 py-3.5">
                                             <div className="flex justify-end gap-1.5">
                                                 <button
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
-                                                    aria-label={`Edit ${driver.name}`}
+                                                    aria-label={`Edit ${driver.first_name}`}
                                                 >
                                                     <Pencil size={15} />
                                                 </button>
                                                 <button
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                                                    aria-label={`Delete ${driver.name}`}
+                                                    aria-label={`Delete ${driver.first_name}`}
                                                 >
                                                     <Trash2 size={15} />
                                                 </button>
                                                 <button
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors"
-                                                    aria-label={`More actions for ${driver.name}`}
+                                                    aria-label={`More actions for ${driver.first_name}`}
                                                 >
                                                     <MoreHorizontal size={15} />
                                                 </button>
@@ -208,7 +226,7 @@ export default function Drivers() {
                                     </tr>
                                 ))}
 
-                                {filtered.length === 0 && (
+                                {driverData.length === 0 && (
                                     <tr>
                                         <td
                                             colSpan={5}
