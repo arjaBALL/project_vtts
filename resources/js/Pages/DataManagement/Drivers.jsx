@@ -2,6 +2,7 @@ import AppLayout from "../../Layouts/AppLayout";
 import Drawer from "../../components/ui/Drawer";
 import { useState } from "react";
 import { useForm, router } from "@inertiajs/react";
+import toast from "react-hot-toast";
 import {
     UserRoundKey,
     Trash2,
@@ -56,9 +57,11 @@ function Field({ label, htmlFor, children }) {
 
 export default function Drivers({ drivers, filters }) {
     const [open, setOpen] = useState(false);
-    const [userToEdit, setUserToEdit] = useState(null);
+    const [driverToEdit, setDriverToEdit] = useState(null);
     const [query, setQuery] = useState(filters?.search ?? "");
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+    const isEditing = Boolean(driverToEdit?.license_number);
 
     const {
         data,
@@ -67,6 +70,7 @@ export default function Drivers({ drivers, filters }) {
         processing,
         errors,
         setError,
+        put,
         clearErrors,
         reset,
     } = useForm({
@@ -81,11 +85,17 @@ export default function Drivers({ drivers, filters }) {
         clearErrors();
         const newErrors = {};
 
-        if (!data.user_id.trim()) newErrors.user_id = "User ID is missing.";
+        if (!String(data.user_id).trim())
+            newErrors.user_id = "User ID is missing.";
         if (!data.license_number.trim())
             newErrors.license_number = "License number is required.";
         if (!data.license_expiry.trim())
-            newErrors.license_expiry = "license expiry is required.";
+            newErrors.license_expiry = "License expiry is required.";
+
+        if (Object.keys(newErrors).length > 0) {
+            setError(newErrors);
+            return false;
+        }
 
         return true;
     };
@@ -108,6 +118,48 @@ export default function Drivers({ drivers, filters }) {
         );
     };
 
+    const openLicenseDrawer = (driver) => {
+        setDriverToEdit(driver);
+
+        setData({
+            user_id: driver.user_id,
+            license_number: driver.license_number ?? "",
+            license_expiry: driver.license_expiry ?? "",
+        });
+
+        clearErrors();
+        setOpen(true);
+    };
+
+    const closeDrawer = () => {
+        setOpen(false);
+        setDriverToEdit(null);
+        reset();
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (!validate()) {
+            toast.error("Please fill up the highlighted fields.");
+            return;
+        }
+
+        if (isEditing) {
+            // Has license -> use drivers.id
+            put(`/drivers/${driverToEdit.id}/license`, {
+                preserveScroll: true,
+                onSuccess: closeDrawer,
+            });
+        } else {
+            // No license -> use users.id
+            post(`/users/${driverToEdit.user_id}/license`, {
+                preserveScroll: true,
+                onSuccess: closeDrawer,
+            });
+        }
+    };
+
     return (
         <AppLayout>
             <div className="p-4 sm:p-6">
@@ -122,13 +174,13 @@ export default function Drivers({ drivers, filters }) {
                             status.
                         </p>
                     </div>
-                    <button
+                    {/* <button
                         onClick={() => setOpen(true)}
                         className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm shadow-blue-600/20 w-fit shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
                     >
                         <UserRoundKey size={17} />
                         <span>New Driver</span>
-                    </button>
+                    </button> */}
                 </div>
 
                 {/* Toolbar */}
@@ -155,22 +207,22 @@ export default function Drivers({ drivers, filters }) {
                 {/* Table */}
                 <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-left">
+                        <table className="min-w-full table-fixed divide-y divide-slate-200 dark:divide-slate-700 text-center">
                             <thead className="bg-slate-50 dark:bg-slate-900/40">
                                 <tr>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                    <th className="w-1/4 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                         Name
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                    <th className="w-1/5 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                         Office Assignment
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                    <th className="w-1/5 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                         License No.
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                    <th className="w-1/5 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                         License Expiry
                                     </th>
-                                    <th className="px-5 py-3">
+                                    <th className="w-30 px-5 py-3">
                                         <span className="sr-only">Actions</span>
                                     </th>
                                 </tr>
@@ -182,32 +234,49 @@ export default function Drivers({ drivers, filters }) {
                                         className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
                                     >
                                         <td className="px-5 py-3.5">
-                                            <div className="w-8 h-8 mx-auto rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
-                                                {initials(
-                                                    `${driver.first_name} ${driver.middle_name ?? ""} ${driver.last_name}`,
-                                                )}
-                                            </div>
+                                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate text-center">
+                                                {driver.first_name}{" "}
+                                                {driver.middle_name
+                                                    ? `${driver.middle_name} `
+                                                    : ""}
+                                                {driver.last_name}
+                                            </p>
                                         </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap text-center">
                                             {driver.abbreviation}
                                         </td>
-                                        <td className="px-5 py-3.5">
+                                        <td className="px-5 py-3.5 text-center">
                                             <StatusBadge
                                                 status={driver.license_number}
                                             />
                                         </td>
-                                        <td className="px-5 py-3.5">
+                                        <td className="px-5 py-3.5 text-center">
                                             <StatusBadge
                                                 status={driver.license_expiry}
                                             />
                                         </td>
                                         <td className="px-5 py-3.5">
-                                            <div className="flex justify-end gap-1.5">
+                                            <div className="flex justify-center gap-1.5">
                                                 <button
+                                                    onClick={() =>
+                                                        openLicenseDrawer(
+                                                            driver,
+                                                        )
+                                                    }
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
-                                                    aria-label={`Edit ${driver.first_name}`}
+                                                    aria-label={
+                                                        driver.user_id
+                                                            ? `Edit license for ID ${driver.user_id}`
+                                                            : `Add license for ID ${driver.user_id}`
+                                                    }
                                                 >
-                                                    <Pencil size={15} />
+                                                    {driver.user_id ? (
+                                                        <Pencil size={15} />
+                                                    ) : (
+                                                        <UserRoundKey
+                                                            size={15}
+                                                        />
+                                                    )}
                                                 </button>
                                                 <button
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
@@ -250,19 +319,27 @@ export default function Drivers({ drivers, filters }) {
 
             <Drawer
                 open={open}
-                onClose={() => setOpen(false)}
-                title="Add New Driver"
-                subtitle="Fill in the details of the new driver below."
+                onClose={closeDrawer}
+                title={isEditing ? "Edit Driver License" : "Add Driver License"}
+                subtitle={
+                    isEditing
+                        ? `Update license details for ${driverToEdit?.first_name ?? ""}.`
+                        : `Add license details for ${driverToEdit?.first_name ?? ""}.`
+                }
                 footer={
                     <div className="flex justify-end gap-2">
                         <button
                             className="px-4 py-2 text-sm font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
-                            onClick={() => setOpen(false)}
+                            onClick={closeDrawer}
                         >
                             Cancel
                         </button>
-                        <button className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20">
-                            Save
+                        <button
+                            onClick={handleSubmit}
+                            disabled={processing}
+                            className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20 disabled:opacity-50"
+                        >
+                            {isEditing ? "Update" : "Save"}
                         </button>
                     </div>
                 }
@@ -271,41 +348,38 @@ export default function Drivers({ drivers, filters }) {
                     Details
                 </p>
 
-                <Field label="First Name" htmlFor="first_name">
+                <Field label="License Number" htmlFor="license_number">
                     <TextInput
-                        id="first_name"
-                        name="first_name"
-                        placeholder="First name"
+                        id="license_number"
+                        name="license_number"
+                        value={data.license_number}
+                        onChange={(e) =>
+                            setData("license_number", e.target.value)
+                        }
+                        placeholder="License number"
                     />
+                    {errors.license_number && (
+                        <p className="text-xs text-red-500 mt-1">
+                            {errors.license_number}
+                        </p>
+                    )}
                 </Field>
-                <Field label="Last Name" htmlFor="last_name">
-                    <TextInput
-                        id="last_name"
-                        name="last_name"
-                        placeholder="Last name"
-                    />
-                </Field>
-                <Field label="Middle Name" htmlFor="middle_name">
-                    <TextInput
-                        id="middle_name"
-                        name="middle_name"
-                        placeholder="Middle name"
-                    />
-                </Field>
-                <Field label="Office Assignment" htmlFor="office">
-                    <SelectInput
-                        id="office"
-                        name="office"
-                        placeholder="Select office"
-                    />
-                </Field>
+
                 <Field label="License Expiry Date" htmlFor="license_expiry">
                     <TextInput
                         id="license_expiry"
                         name="license_expiry"
                         type="date"
-                        placeholder="License expiry date"
+                        value={data.license_expiry}
+                        onChange={(e) =>
+                            setData("license_expiry", e.target.value)
+                        }
                     />
+                    {errors.license_expiry && (
+                        <p className="text-xs text-red-500 mt-1">
+                            {errors.license_expiry}
+                        </p>
+                    )}
                 </Field>
             </Drawer>
         </AppLayout>

@@ -13,13 +13,12 @@ use Inertia\Inertia;
 class UserController extends Controller
 {
     public function __construct
-        (
-            protected UserService $service,
-            protected OfficeService $officeService
-        ) 
-    {
-}
-  public function index(Request $request)
+    (
+        protected UserService $service,
+        protected OfficeService $officeService
+    ) {
+    }
+    public function index(Request $request)
     {
         $search = $request->query('search');
 
@@ -64,13 +63,13 @@ class UserController extends Controller
     }
 
     public function store(StoreUserRequest $request)
-        {
-            $this->service->register($request->validated());
+    {
+        $this->service->register($request->validated());
 
-            return redirect()
-                ->route('users.index')
-                ->with('success', 'User created successfully.');
-        }
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User created successfully.');
+    }
 
     public function update(Request $request, User $user)
     {
@@ -86,7 +85,7 @@ class UserController extends Controller
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'office_id' => ['required', 'integer', 'exists:offices,id'],
-            'role' => ['required', 'string', 'in:admin,staff,user'],
+            'role' => ['required', 'string', 'in:admin,staff,user,driver'],
             'status' => ['required', 'string', 'in:active,inactive'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);

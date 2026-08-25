@@ -283,43 +283,31 @@ export default function Users({ users, offices, filters }) {
                 <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full table-fixed divide-y divide-slate-200 dark:divide-slate-700 text-center">
-                            <colgroup>
-                                <col className="w-10" /> {/* checkbox */}
-                                <col className="w-12" /> {/* avatar */}
-                                <col className="w-32" /> {/* username */}
-                                <col />{" "}
-                                {/* name — flexible, fills remaining space */}
-                                <col className="w-20" /> {/* office */}
-                                <col className="w-28" /> {/* role */}
-                                <col className="w-28" /> {/* status */}
-                                <col className="w-24" /> {/* actions */}
-                            </colgroup>
-
                             <thead className="bg-slate-50 dark:bg-slate-900/40">
                                 <tr>
-                                    <th className="px-4 py-3 align-middle">
+                                    <th className="w-10 px-4 py-3 align-middle">
                                         <input
                                             type="checkbox"
                                             className="rounded border-slate-300 ..."
                                         />
                                     </th>
-                                    <th className="px-2 py-3 align-middle"></th>
-                                    <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
+                                    <th className="w-12 px-2 py-3 align-middle"></th>
+                                    <th className="w-32 px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Username
                                     </th>
                                     <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Name
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
+                                    <th className="w-20 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Office
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
+                                    <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Role
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
+                                    <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Status
                                     </th>
-                                    <th className="px-5 py-3 align-middle">
+                                    <th className="w-24 px-5 py-3 align-middle">
                                         <span className="sr-only">Actions</span>
                                     </th>
                                 </tr>
@@ -331,7 +319,7 @@ export default function Users({ users, offices, filters }) {
                                         key={user.id}
                                         className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
                                     >
-                                        <td className="px-4 py-3.5 align-middle">
+                                        <td className="px-4 py-3.5 align-middle text-center">
                                             <input
                                                 type="checkbox"
                                                 className="rounded border-slate-300 ..."
@@ -344,11 +332,11 @@ export default function Users({ users, offices, filters }) {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-3 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle">
+                                        <td className="px-3 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle text-center">
                                             {user.username}
                                         </td>
-                                        <td className="px-5 py-3.5 align-middle">
-                                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                                        <td className="px-5 py-3.5 align-middle text-center">
+                                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate text-center">
                                                 {user.first_name}{" "}
                                                 {user.middle_name
                                                     ? `${user.middle_name} `
@@ -356,13 +344,13 @@ export default function Users({ users, offices, filters }) {
                                                 {user.last_name}
                                             </p>
                                         </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle">
+                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle text-center">
                                             {user.abbreviation}
                                         </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle">
+                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle text-center">
                                             {user.role}
                                         </td>
-                                        <td className="px-5 py-3.5 align-middle">
+                                        <td className="px-5 py-3.5 align-middle text-center">
                                             <StatusBadge status={user.status} />
                                         </td>
                                         <td className="px-5 py-3.5 align-middle">
@@ -607,7 +595,7 @@ export default function Users({ users, offices, filters }) {
                             <option value="admin">Admin</option>
                             <option value="staff">Staff</option>
                             <option value="user">User</option>
-                            <option value="user">Driver</option>
+                            <option value="driver">Driver</option>
                         </SelectInput>
                         {errors.role && (
                             <p className="mt-1 text-xs text-red-500">

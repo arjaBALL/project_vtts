@@ -11,10 +11,12 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Driver extends Authenticable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
-        ''
+        'user_id',
+        'license_number',
+        'license_expiry'
     ];
-    
+
 }

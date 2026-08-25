@@ -46,6 +46,11 @@ Route::get('/drivers', [DriverController::class, 'index'])->name('drivers.index'
 Route::post('/drivers', [DriverController::class, 'store'])->name('drivers.store');
 Route::put('/drivers/{driver}', [DriverController::class, 'update'])->name('drivers.update');
 Route::delete('/drivers/{driver}', [DriverController::class, 'destroy'])->name('drivers.destroy');
+Route::post('/users/{user}/license', [DriverController::class, 'storeLicense'])
+    ->name('drivers.license.store');
+
+Route::put('/drivers/{driver}/license', [DriverController::class, 'updateLicense'])
+    ->name('drivers.license.update');
 
 // * Requester Pages
 Route::get('/request-trip-ticket', function () {
@@ -65,10 +70,6 @@ Route::get('/assign-review', function () {
     return Inertia::render('Processor/AssignReview');
 });
 
-// * Data Management Pages
-Route::get('/drivers', function () {
-    return Inertia::render('DataManagement/Drivers');
-});
 
 
 
