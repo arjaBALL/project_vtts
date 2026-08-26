@@ -59,9 +59,123 @@ function Field({ label, htmlFor, children }) {
     );
 }
 
-export default function Vehicles({ vehicles, office, filters }) {
+export default function Vehicles({
+    vehicles,
+    offices,
+    vehicle_types,
+    filters,
+}) {
     const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState("");
+    const [vehicleToEdit, setVehicleToEdit] = useState(null);
+    const [query, setQuery] = useState(filters?.search ?? "");
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [vehicleToDelete, setVehicleToDelete] = useState(null);
+
+    const {
+        data,
+        post,
+        setData,
+        processing,
+        errors,
+        setError,
+        clearErrors,
+        reset,
+    } = useForm({
+        plate_number: "",
+        office_id: "",
+        vehicle_type_id: "",
+        model: "",
+        year_model: "",
+        capacity: "",
+        status: "active",
+        fuel_type: "",
+        fleet_card_number: "",
+        fuel_consumption: "",
+    });
+
+    const validate = () => {
+        clearErrors();
+        const newErrors = {};
+
+        if (!data.plate_number.trim())
+            newErrors.plate_number = "Plate number is required.";
+        if (!data.office_id.trim()) newErrors.office_id = "Office is required.";
+        if (!data.vehicle_type_id.trim())
+            newErrors.vehicle_type_id = "Vehicle type is required.";
+        if (!data.model.trim()) newErrors.model = "Model is required.";
+        if (!data.year_model.trim())
+            newErrors.year_model = "Year model is required.";
+        if (!data.capacity.trim()) newErrors.capacity = "Capacity is required.";
+        if (!data.status.trim()) newErrors.status = "Status is required.";
+        if (!data.fuel_type.trim())
+            newErrors.fuel_type = "Fuel type is required.";
+        if (!data.fuel_consumption.trim())
+            newErrors.fuel_consumption = "Fuel consumption is required.";
+
+        if (Object.keys(newErrors).length > 0) {
+            Object.entries(newErrors).forEach(([field, message]) =>
+                setError(field, message),
+            );
+            return false;
+        }
+        return true;
+    };
+
+    const handleEdit = (vehicle) => {
+        setVehicleToEdit(vehicle);
+
+        setData({
+            plate_number: vehicle.plate_number ?? "",
+            office_id: String(vehicle.office_id ?? ""),
+            vehicle_type_id: String(vehicle.vehicle_type_id ?? ""),
+            model: vehicle.model ?? "",
+            year_model: String(vehicle.year_model ?? ""),
+            capacity: String(vehicle.capacity ?? ""),
+            fuel_type: vehicle.fuel_type ?? "",
+            fleet_card_number: vehicle.fleet_card_number ?? "",
+            fuel_consumption: String(vehicle.fuel_consumption ?? ""),
+            status: vehicle.status ?? "active",
+        });
+
+        clearErrors();
+        setOpen(true);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (!validate()) {
+            toast.error("Please fill up the highlighted fields.");
+            return;
+        }
+
+        if (vehicleToEdit) {
+            router.put(`/vehicles/${vehicleToEdit.id}`, data, {
+                onSuccess: () => {
+                    reset();
+                    setVehicleToEdit(null);
+                    setOpen(false);
+                    toast.success("Vehicle updated successfully.");
+                },
+
+                onError: () => {
+                    toast.error("Something went wrong. Please check the form.");
+                },
+            });
+        } else {
+            post("/vehicles", {
+                onSuccess: () => {
+                    reset();
+                    setOpen(false);
+                    toast.success("Vehicle created successfully.");
+                },
+
+                onError: () => {
+                    toast.error("Something went wrong. Please check the form.");
+                },
+            });
+        }
+    };
 
     const handleSearch = (e) => {
         const value = e.target.value;
@@ -79,6 +193,29 @@ export default function Vehicles({ vehicles, office, filters }) {
                 replace: true,
             },
         );
+    };
+
+    const handleDelete = (vehicle) => {
+        setVehicleToDelete(vehicle);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (!vehicleToDelete) return;
+
+        router.delete(`/vehicles/${vehicleToDelete.id}`, {
+            preserveScroll: true,
+
+            onSuccess: () => {
+                toast.success("Vehicle deleted successfully.");
+                setDeleteDialogOpen(false);
+                setVehicleToDelete(null);
+            },
+
+            onError: () => {
+                toast.error("Failed to delete vehicle. Please try again.");
+            },
+        });
     };
 
     return (
@@ -119,7 +256,7 @@ export default function Vehicles({ vehicles, office, filters }) {
                     </div>
                     <p className="text-xs text-slate-400 dark:text-slate-500 ml-auto hidden sm:block">
                         Showing {vehicles.from ?? 0}–{vehicles.to ?? 0} of{" "}
-                        {vehicles.total ?? 0} users
+                        {vehicles.total ?? 0} vehicles
                     </p>
                 </div>
 
@@ -229,6 +366,9 @@ export default function Vehicles({ vehicles, office, filters }) {
                                         <td className="px-2 py-3 text-center">
                                             <div className="flex justify-center gap-1">
                                                 <button
+                                                    onClick={() =>
+                                                        handleEdit(vehicle)
+                                                    }
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
                                                     aria-label={`Edit ${vehicle.id}`}
                                                 >
@@ -236,8 +376,11 @@ export default function Vehicles({ vehicles, office, filters }) {
                                                 </button>
 
                                                 <button
+                                                    onClick={() =>
+                                                        handleDelete(vehicle)
+                                                    }
                                                     className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                                                    aria-label={`Delete ${vehicle.id}`}
+                                                    aria-label={`Delete ${vehicle.plate_number} ${vehicle.model}`}
                                                 >
                                                     <Trash2 size={15} />
                                                 </button>
@@ -273,8 +416,12 @@ export default function Vehicles({ vehicles, office, filters }) {
             <Drawer
                 open={open}
                 onClose={() => setOpen(false)}
-                title="Add New Vehicle"
-                subtitle="Fill in the details of the new vehicle below."
+                title={vehicleToEdit ? "Edit Vehicle" : "Add New Vehicle"}
+                subtitle={
+                    vehicleToEdit
+                        ? "Update the vehicle's information below."
+                        : "Fill in the details of the new vehicle below."
+                }
                 footer={
                     <div className="flex justify-end gap-2">
                         <button
@@ -283,8 +430,17 @@ export default function Vehicles({ vehicles, office, filters }) {
                         >
                             Cancel
                         </button>
-                        <button className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20">
-                            Save
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={processing}
+                            className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20 disabled:opacity-50"
+                        >
+                            {processing
+                                ? "Saving..."
+                                : vehicleToEdit
+                                  ? "Update"
+                                  : "Save"}
                         </button>
                     </div>
                 }
@@ -297,28 +453,72 @@ export default function Vehicles({ vehicles, office, filters }) {
                         id="plate_no"
                         name="plate_no"
                         placeholder="e.g. ABC 123"
+                        value={data.plate_number}
+                        onChange={(e) =>
+                            setData("plate_number", e.target.value)
+                        }
                     />
+
+                    {errors.plate_number && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.plate_number}
+                        </p>
+                    )}
                 </Field>
                 <Field label="Vehicle Type" htmlFor="vehicle_type">
                     <SelectInput
-                        id="vehicle_type"
-                        name="vehicle_type"
+                        id="vehicle_type_id"
+                        name="vehicle_type_id"
                         placeholder="Select type"
-                    />
+                        value={data.vehicle_type_id}
+                        onChange={(e) =>
+                            setData("vehicle_type_id", e.target.value)
+                        }
+                    >
+                        <option value="">Select type</option>
+
+                        {vehicle_types.map((vehicle_type) => (
+                            <option
+                                key={vehicle_type.id}
+                                value={vehicle_type.id}
+                            >
+                                {vehicle_type.name}
+                            </option>
+                        ))}
+                    </SelectInput>
+                    {errors.vehicle_type_id && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.vehicle_type_id}
+                        </p>
+                    )}
                 </Field>
                 <Field label="Model" htmlFor="model">
                     <TextInput
                         id="model"
                         name="model"
                         placeholder="e.g. Toyota Hiace"
+                        value={data.model}
+                        onChange={(e) => setData("model", e.target.value)}
                     />
+                    {errors.model && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.model}
+                        </p>
+                    )}
                 </Field>
                 <Field label="Year Model" htmlFor="year_model">
-                    <SelectInput
+                    <TextInput
                         id="year_model"
                         name="year_model"
                         placeholder="Select year"
+                        value={data.year_model}
+                        onChange={(e) => setData("year_model", e.target.value)}
                     />
+                    {errors.year_model && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.year_model}
+                        </p>
+                    )}
                 </Field>
 
                 <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">
@@ -329,21 +529,50 @@ export default function Vehicles({ vehicles, office, filters }) {
                         id="capacity"
                         name="capacity"
                         placeholder="No. of passengers"
+                        value={data.capacity}
+                        onChange={(e) => setData("capacity", e.target.value)}
                     />
+                    {errors.capacity && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.capacity}
+                        </p>
+                    )}
                 </Field>
                 <Field label="Fuel Type" htmlFor="fuel_type">
                     <SelectInput
                         id="fuel_type"
                         name="fuel_type"
                         placeholder="Select fuel type"
-                    />
+                        value={data.fuel_type}
+                        onChange={(e) => setData("fuel_type", e.target.value)}
+                    >
+                        <option value="">Select fuel type</option>
+                        <option value="gasoline">Gasoline</option>
+                        <option value="diesel">Diesel</option>
+                        <option value="electric">Electric</option>
+                        <option value="hybrid">Hybrid</option>
+                    </SelectInput>
+                    {errors.fuel_type && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.fuel_type}
+                        </p>
+                    )}
                 </Field>
-                <Field label="Fleet Card No." htmlFor="fleet_card">
+                <Field label="Fleet Card No." htmlFor="fleet_card_number">
                     <TextInput
-                        id="fleet_card"
-                        name="fleet_card"
+                        id="fleet_card_number"
+                        name="fleet_card_number"
                         placeholder="e.g. 123456"
+                        value={data.fleet_card_number}
+                        onChange={(e) =>
+                            setData("fleet_card_number", e.target.value)
+                        }
                     />
+                    {errors.fleet_card_number && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.fleet_card_number}
+                        </p>
+                    )}
                 </Field>
                 <Field
                     label="Fuel Consumption (km/L)"
@@ -353,27 +582,89 @@ export default function Vehicles({ vehicles, office, filters }) {
                         id="fuel_consumption"
                         name="fuel_consumption"
                         placeholder="e.g. 12"
+                        value={data.fuel_consumption}
+                        onChange={(e) =>
+                            setData("fuel_consumption", e.target.value)
+                        }
                     />
+                    {errors.fuel_consumption && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.fuel_consumption}
+                        </p>
+                    )}
                 </Field>
-                <Field label="Assigned Office" htmlFor="assigned_office">
+                <Field label="Office" htmlFor="office">
                     <SelectInput
-                        id="assigned_office"
-                        name="assigned_office"
+                        id="office_id"
+                        name="office_id"
                         placeholder="Select office"
-                    />
+                        value={data.office_id}
+                        onChange={(e) => setData("office_id", e.target.value)}
+                    >
+                        <option value="">Select office</option>
+
+                        {offices.map((office) => (
+                            <option key={office.id} value={office.id}>
+                                {office.office} ({office.abbreviation})
+                            </option>
+                        ))}
+                    </SelectInput>
+
+                    {errors.office_id && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.office_id}
+                        </p>
+                    )}
                 </Field>
 
                 <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">
                     Status & maintenance
                 </p>
-                <Field label="Vehicle Status" htmlFor="vehicle_status">
+                <Field label="Vehicle Status" htmlFor="status">
                     <SelectInput
-                        id="vehicle_status"
-                        name="vehicle_status"
+                        id="status"
+                        name="status"
                         placeholder="Select status"
-                    />
+                        value={data.status}
+                        onChange={(e) => setData("status", e.target.value)}
+                    >
+                        <option value="">Select status</option>
+                        <option value="active">Active</option>
+                        <option value="under_maintenance">
+                            Under maintenance
+                        </option>
+                        <option value="inactive">Inactive</option>
+                        <option value="disposed">Disposed</option>
+                        <option value="retired">Retired</option>
+                    </SelectInput>
+                    {errors.status && (
+                        <p className="mt-1 text-xs text-red-500">
+                            {errors.status}
+                        </p>
+                    )}
                 </Field>
             </Drawer>
+
+            <ConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={(open) => {
+                    setDeleteDialogOpen(open);
+
+                    if (!open) {
+                        setVehicleToDelete(null);
+                    }
+                }}
+                title="Delete vehicle?"
+                description={
+                    vehicleToDelete
+                        ? `Delete ${vehicleToDelete.plate_number} ${vehicleToDelete.model}? This can be undone by an admin.`
+                        : ""
+                }
+                confirmText="Delete"
+                cancelText="Cancel"
+                destructive
+                onConfirm={confirmDelete}
+            />
         </AppLayout>
     );
 }
