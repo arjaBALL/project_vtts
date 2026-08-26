@@ -173,7 +173,6 @@ export default function Users({ users, offices, filters }) {
                     reset();
                     setUserToEdit(null);
                     setOpen(false);
-
                     toast.success("User updated successfully.");
                 },
 
@@ -186,7 +185,6 @@ export default function Users({ users, offices, filters }) {
                 onSuccess: () => {
                     reset();
                     setOpen(false);
-
                     toast.success("User created successfully.");
                 },
 

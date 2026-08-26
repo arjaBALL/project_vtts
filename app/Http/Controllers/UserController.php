@@ -18,13 +18,14 @@ class UserController extends Controller
         protected OfficeService $officeService
     ) {
     }
+    
     public function index(Request $request)
     {
         $search = $request->query('search');
 
         $users = User::query()
             ->join('offices', 'users.office_id', '=', 'offices.id')
-            //  ->where('users.status', 'active')
+            ->where('users.status', 'active')
             ->select([
                 'users.id',
                 'users.username',
@@ -71,24 +72,9 @@ class UserController extends Controller
             ->with('success', 'User created successfully.');
     }
 
-    public function update(Request $request, User $user)
+    public function update(StoreUserRequest $request, User $user)
     {
-        $validated = $request->validate([
-            'username' => [
-                'required',
-                'string',
-                'min:3',
-                'max:255',
-                'unique:users,username,' . $user->id,
-            ],
-            'first_name' => ['required', 'string', 'max:255'],
-            'middle_name' => ['nullable', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'office_id' => ['required', 'integer', 'exists:offices,id'],
-            'role' => ['required', 'string', 'in:admin,staff,user,driver'],
-            'status' => ['required', 'string', 'in:active,inactive'],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-        ]);
+        $validated = $request->validated();
 
         $user->username = $validated['username'];
         $user->first_name = $validated['first_name'];

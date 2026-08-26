@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\VehicleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,14 +47,16 @@ Route::get('/drivers', [DriverController::class, 'index'])->name('drivers.index'
 Route::post('/drivers', [DriverController::class, 'store'])->name('drivers.store');
 Route::put('/drivers/{driver}', [DriverController::class, 'update'])->name('drivers.update');
 Route::delete('/drivers/{driver}', [DriverController::class, 'destroy'])->name('drivers.destroy');
-Route::post('/users/{user}/license', [DriverController::class, 'storeLicense'])
-    ->name('drivers.license.store');
 
-Route::put('/drivers/{driver}/license', [DriverController::class, 'updateLicense'])
-    ->name('drivers.license.update');
+
+// Vehicle ROUTES
+Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
+Route::post('/vehicles', [VehicleController::class, 'store'])->name('vehicles.store');
+Route::put('/vehicles/{vehicle}', [VehicleController::class, 'update'])->name('vehicles.update');
+Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicles.destroy');
 
 // * Requester Pages
-Route::get('/request-trip-ticket', function () {
+Route::get('/request-trip-ticket ', function () {
     return Inertia::render('Requester/RequestTripTickets');
 });
 
@@ -68,16 +71,6 @@ Route::get('/incoming-queue', function () {
 
 Route::get('/assign-review', function () {
     return Inertia::render('Processor/AssignReview');
-});
-
-
-
-
-
-
-
-Route::get('/vehicles', function () {
-    return Inertia::render('DataManagement/Vehicles');
 });
 
 Route::get('/profile', function () {

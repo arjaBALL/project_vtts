@@ -20,6 +20,12 @@ const STATUS_STYLES = {
         "bg-slate-100 text-slate-500 ring-1 ring-inset ring-slate-500/15 dark:bg-slate-500/10 dark:text-slate-400 dark:ring-slate-500/20",
 };
 
+function licenseStatus(driver) {
+    if (!driver.license_number) return "Inactive";
+    if (!driver.license_expiry) return "Inactive";
+    return new Date(driver.license_expiry) < new Date() ? "Expired" : "Active";
+}
+
 function initials(name) {
     return name
         .split(" ")
@@ -147,15 +153,29 @@ export default function Drivers({ drivers, filters }) {
 
         if (isEditing) {
             // Has license -> use drivers.id
-            put(`/drivers/${driverToEdit.id}/license`, {
-                preserveScroll: true,
-                onSuccess: closeDrawer,
+            put(`/drivers/${driverToEdit.id}`, {
+                onSuccess: () => {
+                    reset();
+                    setOpen(false);
+                    toast.success("Driver details updated successfully.");
+                },
+
+                onError: () => {
+                    toast.error("Something went wrong. Please check the form.");
+                },
             });
         } else {
-            // No license -> use users.id
-            post(`/users/${driverToEdit.user_id}/license`, {
-                preserveScroll: true,
-                onSuccess: closeDrawer,
+            // No license -> use drivers.id
+            post("/drivers", {
+                onSuccess: () => {
+                    reset();
+                    setOpen(false);
+                    toast.success("Driver details updated successfully.");
+                },
+
+                onError: () => {
+                    toast.error("Something went wrong. Please check the form.");
+                },
             });
         }
     };
@@ -222,6 +242,9 @@ export default function Drivers({ drivers, filters }) {
                                     <th className="w-1/5 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                         License Expiry
                                     </th>
+                                    <th className="w-1/5 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                        License Status
+                                    </th>
                                     <th className="w-30 px-5 py-3">
                                         <span className="sr-only">Actions</span>
                                     </th>
@@ -245,14 +268,19 @@ export default function Drivers({ drivers, filters }) {
                                         <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap text-center">
                                             {driver.abbreviation}
                                         </td>
-                                        <td className="px-5 py-3.5 text-center">
-                                            <StatusBadge
-                                                status={driver.license_number}
-                                            />
+                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 text-center">
+                                            {driver.license_number ?? "—"}
+                                        </td>
+                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 text-center">
+                                            {driver.license_expiry
+                                                ? new Date(
+                                                      driver.license_expiry,
+                                                  ).toLocaleDateString()
+                                                : "—"}
                                         </td>
                                         <td className="px-5 py-3.5 text-center">
                                             <StatusBadge
-                                                status={driver.license_expiry}
+                                                status={licenseStatus(driver)}
                                             />
                                         </td>
                                         <td className="px-5 py-3.5">
@@ -277,18 +305,6 @@ export default function Drivers({ drivers, filters }) {
                                                             size={15}
                                                         />
                                                     )}
-                                                </button>
-                                                <button
-                                                    className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                                                    aria-label={`Delete ${driver.first_name}`}
-                                                >
-                                                    <Trash2 size={15} />
-                                                </button>
-                                                <button
-                                                    className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors"
-                                                    aria-label={`More actions for ${driver.first_name}`}
-                                                >
-                                                    <MoreHorizontal size={15} />
                                                 </button>
                                             </div>
                                         </td>
