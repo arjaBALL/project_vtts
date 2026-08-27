@@ -3,6 +3,7 @@ import Drawer from "../../components/ui/Drawer";
 import { useState } from "react";
 import { useForm, router } from "@inertiajs/react";
 import toast from "react-hot-toast";
+import { PageHeader } from "../../components/ui/PageHeader";
 import {
     UserRoundKey,
     Trash2,
@@ -184,15 +185,13 @@ export default function Drivers({ drivers, filters }) {
         <AppLayout>
             <div className="p-4 sm:p-6">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                    <div>
-                        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
-                            Drivers
-                        </h1>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                            Manage drivers, their office assignment, and license
-                            status.
-                        </p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                    <div className="flex items-start ">
+                        <PageHeader
+                            title="Manage Drivers"
+                            description="Manage drivers, their office assignment, and license
+                            status."
+                        />
                     </div>
                     {/* <button
                         onClick={() => setOpen(true)}

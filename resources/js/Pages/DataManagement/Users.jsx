@@ -240,7 +240,7 @@ export default function Users({ users, offices, filters }) {
         <AppLayout>
             <div className="p-4 sm:p-6">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                     <div className="flex items-start ">
                         <PageHeader
                             title="Manage Users"
@@ -293,10 +293,10 @@ export default function Users({ users, offices, filters }) {
                                     <th className="w-32 px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Username
                                     </th>
-                                    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
+                                    <th className="w-48 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Name
                                     </th>
-                                    <th className="w-20 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
+                                    <th className="w-24 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Office
                                     </th>
                                     <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
@@ -305,7 +305,7 @@ export default function Users({ users, offices, filters }) {
                                     <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Status
                                     </th>
-                                    <th className="w-24 px-5 py-3 align-middle">
+                                    <th className="w-32 px-5 py-3 align-middle">
                                         <span className="sr-only">Actions</span>
                                     </th>
                                 </tr>
