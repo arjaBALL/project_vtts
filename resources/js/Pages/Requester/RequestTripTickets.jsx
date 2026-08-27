@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AppLayout from "../../Layouts/AppLayout"; // Go up one level, then into Layouts
+import AppLayout from "../../Layouts/AppLayout";
 import Drawer from "../../components/ui/Drawer";
 import { useForm, router } from "@inertiajs/react";
 import { PageHeader } from "../../components/ui/PageHeader";
@@ -27,7 +27,7 @@ function Field({ label, htmlFor, children }) {
     );
 }
 
-export default function RequestTripTicket({ filters }) {
+export default function RequestTripTicket({ triptickets, filters }) {
     const [open, setOpen] = useState(false);
     const [tickettoEdit, setTicketToEdit] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -42,6 +42,7 @@ export default function RequestTripTicket({ filters }) {
     const {
         data,
         post,
+        put, // Add put for updates
         setData,
         processing,
         errors,
@@ -49,12 +50,14 @@ export default function RequestTripTicket({ filters }) {
         clearErrors,
         reset,
     } = useForm({
-        departure_date: "",
-        return_date: "",
+        user_id: "",
+        trip_ticket_no: "",
+        departure_date: formattedToday,
+        return_date: formattedToday,
         destination: "",
-        passengers: "",
+        passengers: "1",
         purpose: "",
-        status: "active",
+        status: "pending",
     });
 
     const validate = () => {
@@ -71,6 +74,14 @@ export default function RequestTripTicket({ filters }) {
             newErrors.passengers = "Passengers is required.";
         if (!data.purpose.trim()) newErrors.purpose = "Purpose is required.";
 
+        // Validate return date is after departure date
+        if (data.return_date && data.departure_date) {
+            if (new Date(data.return_date) < new Date(data.departure_date)) {
+                newErrors.return_date =
+                    "Return date must be after departure date.";
+            }
+        }
+
         if (Object.keys(newErrors).length > 0) {
             Object.entries(newErrors).forEach(([field, message]) =>
                 setError(field, message),
@@ -80,12 +91,95 @@ export default function RequestTripTicket({ filters }) {
         return true;
     };
 
+    const handleSearch = (e) => {
+        const value = e.target.value;
+        setQuery(value);
+        router.get(
+            "/triptickets",
+            {
+                search: value,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
+        );
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
         if (!validate()) {
             toast.error("Please fill up highlighted fields");
+            return;
         }
+
+        if (tickettoEdit) {
+            // Use PUT for updates
+            put(`/triptickets/${tickettoEdit.id}`, {
+                onSuccess: () => {
+                    reset();
+                    setTicketToEdit(null);
+                    setOpen(false);
+                    toast.success("Trip ticket updated successfully.");
+                },
+                onError: (errors) => {
+                    if (errors && typeof errors === "object") {
+                        Object.entries(errors).forEach(([field, message]) => {
+                            setError(field, message);
+                        });
+                        toast.error("Please check the highlighted fields.");
+                    } else {
+                        toast.error(
+                            "Something went wrong. Please check the form.",
+                        );
+                    }
+                },
+            });
+        } else {
+            post("/triptickets", {
+                onSuccess: () => {
+                    reset();
+                    setOpen(false);
+                    toast.success("Trip ticket created successfully.");
+                },
+                onError: (errors) => {
+                    if (errors && typeof errors === "object") {
+                        Object.entries(errors).forEach(([field, message]) => {
+                            setError(field, message);
+                        });
+                        toast.error("Please check the highlighted fields.");
+                    } else {
+                        toast.error(
+                            "Something went wrong. Please check the form.",
+                        );
+                    }
+                },
+            });
+        }
+    };
+
+    // FIXED: Delete handler - pass the actual ticket, not the whole list
+    const handleDelete = (ticket) => {
+        setTicketToDelete(ticket);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (!ticketToDelete) return;
+
+        router.delete(`/triptickets/${ticketToDelete.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success("Trip ticket deleted successfully.");
+                setDeleteDialogOpen(false);
+                setTicketToDelete(null);
+            },
+            onError: () => {
+                toast.error("Failed to delete ticket. Please try again.");
+            },
+        });
     };
 
     return (
@@ -107,14 +201,19 @@ export default function RequestTripTicket({ filters }) {
                             />
                             <input
                                 type="text"
-                                placeholder="Search by name or office..."
+                                value={query}
+                                onChange={handleSearch}
+                                placeholder="Search by destination or purpose..."
                                 className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
                             />
                         </div>
 
                         <button
                             type="button"
-                            onClick={() => setOpen(true)}
+                            onClick={() => {
+                                setOpen(true);
+                                clearErrors();
+                            }}
                             className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 dark:bg-blue-500 px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 dark:hover:bg-blue-600 active:bg-blue-800 dark:active:bg-blue-700 transition-colors"
                         >
                             <Plus size={16} />
@@ -140,7 +239,13 @@ export default function RequestTripTicket({ filters }) {
                                             Destination
                                         </th>
                                         <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                            Passengers
+                                        </th>
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                             Purpose
+                                        </th>
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                            Status
                                         </th>
                                         <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                             Driver
@@ -152,82 +257,306 @@ export default function RequestTripTicket({ filters }) {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
-                                    <tr className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors">
-                                        <td className="px-5 py-3.5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
-                                                    AB
-                                                </div>
-                                                <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                                    Name
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                                            Field 2
-                                        </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                                            Field 3
-                                        </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                                            Field 3
-                                        </td>
-                                        <td className="px-5 py-3.5"></td>
-                                        <td className="px-5 py-3.5"></td>
-                                        <td className="px-5 py-3.5">
-                                            <div className="flex justify-end gap-1.5">
-                                                <button
-                                                    className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
-                                                    aria-label="Edit"
-                                                >
-                                                    <Pencil size={15} />
-                                                </button>
-                                                <button
-                                                    className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                                                    aria-label="Delete"
-                                                >
-                                                    <Trash2 size={15} />
-                                                </button>
-                                                <button
-                                                    className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors"
-                                                    aria-label="More actions"
-                                                >
-                                                    <MoreHorizontal size={15} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
 
-                                    {/* Empty state — show conditionally when there's no data
-                <tr>
-                    <td colSpan={7} className="px-5 py-12 text-center">
-                        <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                            No results found
-                        </p>
-                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                            Try a different search, or add a new item.
-                        </p>
-                    </td>
-                </tr>
-                */}
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
+                                    {triptickets?.data?.length > 0 ? (
+                                        triptickets.data.map((ticket) => (
+                                            <tr
+                                                key={ticket.id}
+                                                className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
+                                            >
+                                                {/* Trip Ticket Number */}
+                                                <td className="px-5 py-3.5">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
+                                                            {ticket.trip_ticket_no
+                                                                ?.slice(0, 2)
+                                                                .toUpperCase() ??
+                                                                "TT"}
+                                                        </div>
+                                                        <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                                                            {
+                                                                ticket.trip_ticket_no
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </td>
+
+                                                {/* Departure Date */}
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                                                    {ticket.departure_date}
+                                                </td>
+
+                                                {/* Return Date */}
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                                                    {ticket.return_date}
+                                                </td>
+
+                                                {/* Destination */}
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                                                    {ticket.destination}
+                                                </td>
+
+                                                {/* Passengers */}
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                                                    {ticket.passengers}
+                                                </td>
+
+                                                {/* Purpose */}
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400">
+                                                    {ticket.purpose}
+                                                </td>
+
+                                                {/* Status */}
+                                                <td className="px-5 py-3.5">
+                                                    <span
+                                                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
+                                                            ticket.status ===
+                                                            "approved"
+                                                                ? "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400"
+                                                                : ticket.status ===
+                                                                    "rejected"
+                                                                  ? "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400"
+                                                                  : "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400"
+                                                        }`}
+                                                    >
+                                                        {ticket.status
+                                                            ? ticket.status
+                                                                  .charAt(0)
+                                                                  .toUpperCase() +
+                                                              ticket.status.slice(
+                                                                  1,
+                                                              )
+                                                            : "Pending"}
+                                                    </span>
+                                                </td>
+
+                                                {/* Driver */}
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400">
+                                                    {ticket.driver?.name ?? "—"}
+                                                </td>
+
+                                                {/* Actions */}
+                                                <td className="px-5 py-3.5">
+                                                    <div className="flex justify-end gap-1.5">
+                                                        {/* Edit */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setTicketToEdit(
+                                                                    ticket,
+                                                                );
+                                                                // FIXED: Set all form fields including hidden ones
+                                                                setData({
+                                                                    user_id:
+                                                                        ticket.user_id ||
+                                                                        "",
+                                                                    trip_ticket_no:
+                                                                        ticket.trip_ticket_no ||
+                                                                        "",
+                                                                    departure_date:
+                                                                        ticket.departure_date ||
+                                                                        formattedToday,
+                                                                    return_date:
+                                                                        ticket.return_date ||
+                                                                        formattedToday,
+                                                                    destination:
+                                                                        ticket.destination ||
+                                                                        "",
+                                                                    passengers:
+                                                                        String(
+                                                                            ticket.passengers ||
+                                                                                "1",
+                                                                        ),
+                                                                    purpose:
+                                                                        ticket.purpose ||
+                                                                        "",
+                                                                    status:
+                                                                        ticket.status ||
+                                                                        "pending",
+                                                                });
+                                                                setOpen(true);
+                                                            }}
+                                                            className="p-1.5 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
+                                                            aria-label="Edit"
+                                                        >
+                                                            <Pencil size={15} />
+                                                        </button>
+
+                                                        {/* Delete */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    ticket,
+                                                                )
+                                                            } // FIXED: Pass the ticket, not triptickets
+                                                            className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                                            aria-label="Delete"
+                                                        >
+                                                            <Trash2 size={15} />
+                                                        </button>
+
+                                                        {/* More */}
+                                                        <button
+                                                            type="button"
+                                                            className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                                            aria-label="More actions"
+                                                        >
+                                                            <MoreHorizontal
+                                                                size={15}
+                                                            />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td
+                                                colSpan={9}
+                                                className="px-5 py-12 text-center"
+                                            >
+                                                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                                                    No trip tickets found
+                                                </p>
+                                                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                                                    Try a different search, or
+                                                    create a new trip ticket.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
+
+                        {/* Pagination */}
+                        {triptickets?.links && triptickets.links.length > 3 && (
+                            <div className="flex items-center justify-between px-5 py-4 border-t border-slate-200 dark:border-slate-700">
+                                <div className="text-sm text-slate-500 dark:text-slate-400">
+                                    Showing{" "}
+                                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                                        {triptickets.from ?? 0}
+                                    </span>{" "}
+                                    to{" "}
+                                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                                        {triptickets.to ?? 0}
+                                    </span>{" "}
+                                    of{" "}
+                                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                                        {triptickets.total ?? 0}
+                                    </span>{" "}
+                                    results
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    {triptickets.links.map((link, index) => {
+                                        if (!link.url) {
+                                            return (
+                                                <span
+                                                    key={index}
+                                                    className="px-3 py-1.5 text-sm text-slate-400 dark:text-slate-600"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: link.label,
+                                                    }}
+                                                />
+                                            );
+                                        }
+                                        return (
+                                            <button
+                                                key={index}
+                                                type="button"
+                                                onClick={() => {
+                                                    router.get(
+                                                        link.url,
+                                                        {},
+                                                        {
+                                                            preserveState: true,
+                                                            preserveScroll: true,
+                                                        },
+                                                    );
+                                                }}
+                                                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                                                    link.active
+                                                        ? "bg-blue-600 text-white"
+                                                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                }`}
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label,
+                                                }}
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
+                {/* Delete Confirmation Dialog */}
+                {deleteDialogOpen && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4">
+                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                                Delete Trip Ticket
+                            </h3>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
+                                Are you sure you want to delete trip ticket{" "}
+                                <span className="font-medium">
+                                    {ticketToDelete?.trip_ticket_no}
+                                </span>
+                                ? This action cannot be undone.
+                            </p>
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setDeleteDialogOpen(false);
+                                        setTicketToDelete(null);
+                                    }}
+                                    className="px-4 py-2 text-sm font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={confirmDelete}
+                                    className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm shadow-red-600/20"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <Drawer
                     open={open}
-                    onClose={() => setOpen(false)}
-                    title="Create New Trip Ticket"
-                    subtitle="Enter the required trip, vehicle, and passenger details below."
+                    onClose={() => {
+                        setOpen(false);
+                        setTicketToEdit(null);
+                        clearErrors();
+                    }}
+                    title={
+                        tickettoEdit
+                            ? "Edit Trip Ticket"
+                            : "Create New Trip Ticket"
+                    }
+                    subtitle={
+                        tickettoEdit
+                            ? "Update the trip ticket details below."
+                            : "Enter the required trip, vehicle, and passenger details below."
+                    }
                     footer={
                         <div className="flex justify-end gap-2">
                             <button
                                 type="button"
                                 className="px-4 py-2 text-sm font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
-                                onClick={() => setOpen(false)}
+                                onClick={() => {
+                                    setOpen(false);
+                                    setTicketToEdit(null);
+                                    clearErrors();
+                                }}
                             >
                                 Cancel
                             </button>
@@ -257,7 +586,7 @@ export default function RequestTripTicket({ filters }) {
                                 id="departure_date"
                                 name="departure_date"
                                 type="date"
-                                defaultValue={formattedToday}
+                                value={data.departure_date} // FIXED: Added value prop
                                 onChange={(e) =>
                                     setData("departure_date", e.target.value)
                                 }
@@ -275,7 +604,7 @@ export default function RequestTripTicket({ filters }) {
                                 id="return_date"
                                 name="return_date"
                                 type="date"
-                                defaultValue={formattedToday}
+                                value={data.return_date} // FIXED: Changed from departure_date to return_date
                                 onChange={(e) =>
                                     setData("return_date", e.target.value)
                                 }
@@ -294,6 +623,7 @@ export default function RequestTripTicket({ filters }) {
                                     id="destination"
                                     name="destination"
                                     placeholder="Enter destination"
+                                    value={data.destination} // FIXED: Added value prop
                                     onChange={(e) =>
                                         setData("destination", e.target.value)
                                     }
@@ -313,7 +643,7 @@ export default function RequestTripTicket({ filters }) {
                                     name="passengers"
                                     type="number"
                                     min="1"
-                                    defaultValue="1"
+                                    value={data.passengers} // FIXED: Added value prop
                                     placeholder="Enter Passengers"
                                     onChange={(e) =>
                                         setData("passengers", e.target.value)
@@ -335,6 +665,7 @@ export default function RequestTripTicket({ filters }) {
                                     name="purpose"
                                     rows={4}
                                     placeholder="Enter the purpose of the trip"
+                                    value={data.purpose} // FIXED: Added value prop
                                     className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900/60 px-3 py-2 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 transition-colors duration-150 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
                                     onChange={(e) =>
                                         setData("purpose", e.target.value)

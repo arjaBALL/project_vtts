@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\TripTicketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,10 +56,11 @@ Route::post('/vehicles', [VehicleController::class, 'store'])->name('vehicles.st
 Route::put('/vehicles/{vehicle}', [VehicleController::class, 'update'])->name('vehicles.update');
 Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicles.destroy');
 
-// * Requester Pages
-Route::get('/request-trip-ticket ', function () {
-    return Inertia::render('Requester/RequestTripTickets');
-});
+// TRIPTICKET ROUTES
+Route::get('/request-trip-ticket', [TripTicketController::class, 'index'])->name('triptickets.index');
+Route::post('/triptickets', [TripTicketController::class, 'store'])->name('triptickets.store');
+Route::put('/triptickets/{tripticket}', [TripTicketController::class, 'update'])->name('triptickets.update');
+Route::delete('/triptickets/{tripticket}', [TripTicketController::class, 'destroy'])->name('triptickets.destroy');
 
 Route::get('/my-tickets', function () {
     return Inertia::render('Requester/MyTickets');

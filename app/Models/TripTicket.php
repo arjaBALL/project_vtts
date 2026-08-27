@@ -8,12 +8,13 @@ use Illuminate\Foundation\Auth\User as Authenticable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class TripTicket extends Authenticable
+class TripTicket extends Model
 {
     use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'user_id',
+        'trip_ticket_no',
         'departure_date',
         'return_date',
         'destination',
