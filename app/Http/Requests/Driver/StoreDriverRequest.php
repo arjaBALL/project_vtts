@@ -24,7 +24,9 @@ class StoreDriverRequest extends FormRequest
             'max:50',
             Rule::unique('drivers', 'license_number')->ignore($driverId),
         ],
-        'license_expiry' => ['required', 'date'],
+        'license_expiry' => [
+            'required', 'date'
+        ],
     ];
 }
     public function messages(): array 

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import AppLayout from "../../Layouts/AppLayout"; // Go up one level, then into Layouts
 import Drawer from "../../components/ui/Drawer";
+import { useForm, router } from "@inertiajs/react";
 import { PageHeader } from "../../components/ui/PageHeader";
+import toast from "react-hot-toast";
 import { Trash2, Pencil, Search, MoreHorizontal, Plus } from "lucide-react";
 import {
     TextInput,
@@ -25,8 +27,66 @@ function Field({ label, htmlFor, children }) {
     );
 }
 
-export default function RequestTripTicket() {
+export default function RequestTripTicket({ filters }) {
     const [open, setOpen] = useState(false);
+    const [tickettoEdit, setTicketToEdit] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [ticketToDelete, setTicketToDelete] = useState(null);
+    const [query, setQuery] = useState(filters?.search ?? "");
+
+    const today = new Date();
+    const formattedToday = `${today.getFullYear()}-${String(
+        today.getMonth() + 1,
+    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+    const {
+        data,
+        post,
+        setData,
+        processing,
+        errors,
+        setError,
+        clearErrors,
+        reset,
+    } = useForm({
+        departure_date: "",
+        return_date: "",
+        destination: "",
+        passengers: "",
+        purpose: "",
+        status: "active",
+    });
+
+    const validate = () => {
+        clearErrors();
+        const newErrors = {};
+
+        if (!data.departure_date.trim())
+            newErrors.departure_date = "Departure date is required.";
+        if (!data.return_date.trim())
+            newErrors.return_date = "Return date is required.";
+        if (!data.destination.trim())
+            newErrors.destination = "Destination is required.";
+        if (!data.passengers.trim())
+            newErrors.passengers = "Passengers is required.";
+        if (!data.purpose.trim()) newErrors.purpose = "Purpose is required.";
+
+        if (Object.keys(newErrors).length > 0) {
+            Object.entries(newErrors).forEach(([field, message]) =>
+                setError(field, message),
+            );
+            return false;
+        }
+        return true;
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (!validate()) {
+            toast.error("Please fill up highlighted fields");
+        }
+    };
 
     return (
         <AppLayout>
@@ -173,10 +233,15 @@ export default function RequestTripTicket() {
                             </button>
                             <button
                                 type="button"
-                                className="px-4 py-2 text-sm font-medium bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors shadow-sm shadow-blue-600/20 dark:shadow-blue-500/20"
-                                onClick={() => setOpen(false)}
+                                onClick={handleSubmit}
+                                disabled={processing}
+                                className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20 disabled:opacity-50"
                             >
-                                Save
+                                {processing
+                                    ? "Saving..."
+                                    : tickettoEdit
+                                      ? "Update"
+                                      : "Save"}
                             </button>
                         </div>
                     }
@@ -192,7 +257,16 @@ export default function RequestTripTicket() {
                                 id="departure_date"
                                 name="departure_date"
                                 type="date"
+                                defaultValue={formattedToday}
+                                onChange={(e) =>
+                                    setData("departure_date", e.target.value)
+                                }
                             />
+                            {errors.departure_date && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.departure_date}
+                                </p>
+                            )}
                         </Field>
 
                         {/* Return Date */}
@@ -201,7 +275,16 @@ export default function RequestTripTicket() {
                                 id="return_date"
                                 name="return_date"
                                 type="date"
+                                defaultValue={formattedToday}
+                                onChange={(e) =>
+                                    setData("return_date", e.target.value)
+                                }
                             />
+                            {errors.return_date && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.return_date}
+                                </p>
+                            )}
                         </Field>
 
                         {/* Destination - Full Row */}
@@ -211,17 +294,36 @@ export default function RequestTripTicket() {
                                     id="destination"
                                     name="destination"
                                     placeholder="Enter destination"
+                                    onChange={(e) =>
+                                        setData("destination", e.target.value)
+                                    }
                                 />
+                                {errors.destination && (
+                                    <p className="mt-1 text-xs text-red-500">
+                                        {errors.destination}
+                                    </p>
+                                )}
                             </Field>
                         </div>
 
                         <div className="md:col-span-2">
                             <Field label="Passengers" htmlFor="passengers">
                                 <NumberInput
-                                    id="Passengers"
+                                    id="passengers"
                                     name="passengers"
+                                    type="number"
+                                    min="1"
+                                    defaultValue="1"
                                     placeholder="Enter Passengers"
+                                    onChange={(e) =>
+                                        setData("passengers", e.target.value)
+                                    }
                                 />
+                                {errors.passengers && (
+                                    <p className="mt-1 text-xs text-red-500">
+                                        {errors.passengers}
+                                    </p>
+                                )}
                             </Field>
                         </div>
 
@@ -234,7 +336,15 @@ export default function RequestTripTicket() {
                                     rows={4}
                                     placeholder="Enter the purpose of the trip"
                                     className="w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900/60 px-3 py-2 text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 transition-colors duration-150 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
+                                    onChange={(e) =>
+                                        setData("purpose", e.target.value)
+                                    }
                                 />
+                                {errors.purpose && (
+                                    <p className="mt-1 text-xs text-red-500">
+                                        {errors.purpose}
+                                    </p>
+                                )}
                             </Field>
                         </div>
                     </form>
