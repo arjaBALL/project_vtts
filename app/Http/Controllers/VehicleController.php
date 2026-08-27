@@ -27,6 +27,8 @@ class VehicleController extends Controller
             ->select([
                 'vehicles.id',
                 'vehicles.plate_number',
+                'vehicles.office_id',
+                'vehicles.vehicle_type_id',
                 'vehicle_types.name as vehicle_type',
                 'vehicles.model',
                 'vehicles.year_model',
@@ -76,6 +78,28 @@ class VehicleController extends Controller
             ->route('vehicles.index')
             ->with('success', 'Vehicle added successfully.');
     }
+
+    public function update(StoreVehicleRequest $request, Vehicle $vehicle)
+        {
+            $validated = $request->validated();
+
+            $vehicle->plate_number = $validated['plate_number'];
+            $vehicle->model = $validated['model'];
+            $vehicle->vehicle_type_id = $validated['vehicle_type_id'];
+            $vehicle->year_model = $validated['year_model'];
+            $vehicle->capacity = $validated['capacity'];
+            $vehicle->fuel_type = $validated['fuel_type'];
+            $vehicle->fleet_card_number = $validated['fleet_card_number'];
+            $vehicle->status = $validated['status'];
+            $vehicle->office_id = $validated['office_id'];
+            $vehicle->fuel_consumption = $validated['fuel_consumption'];
+
+            $vehicle->save();
+
+            return redirect()
+            ->route('vehicles.index')
+            ->with('success',  'Vehicle details updated success');
+        }
 
     public function destroy(Vehicle $vehicle)
     {

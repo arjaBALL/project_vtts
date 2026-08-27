@@ -266,8 +266,8 @@ export default function Vehicles({
                         <table className="min-w-full table-fixed divide-y divide-slate-200 dark:divide-slate-700 text-center">
                             <thead className="bg-slate-50 dark:bg-slate-900/40">
                                 <tr>
-                                    <th className="w-12 px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"></th>
-                                    <th className="w-32 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-8 px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"></th>
+                                    <th className="w-20 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                         Plate No.
                                     </th>
                                     <th className="w-28 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -282,7 +282,7 @@ export default function Vehicles({
                                     <th className="w-20 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                         Year
                                     </th>
-                                    <th className="w-20 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-16 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                         Capacity
                                     </th>
                                     <th className="w-24 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
