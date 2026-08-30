@@ -44,36 +44,50 @@ Route::delete('/offices/{office}', [OfficeController::class, 'destroy'])->name('
 // DRIVER ROUTES
 
 // DRIVER ROUTES
-Route::get('/drivers', [DriverController::class, 'index'])->name('drivers.index');
-Route::post('/drivers', [DriverController::class, 'store'])->name('drivers.store');
-Route::put('/drivers/{driver}', [DriverController::class, 'update'])->name('drivers.update');
-Route::delete('/drivers/{driver}', [DriverController::class, 'destroy'])->name('drivers.destroy');
+Route::get('/drivers', [DriverController::class, 'index'])
+    ->name('drivers.index');
+Route::post('/drivers', [DriverController::class, 'store'])
+    ->name('drivers.store');
+Route::put('/drivers/{driver}', [DriverController::class, 'update'])
+    ->name('drivers.update');
+Route::delete('/drivers/{driver}', [DriverController::class, 'destroy'])
+    ->name('drivers.destroy');
 
 
 // Vehicle ROUTES
-Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
-Route::post('/vehicles', [VehicleController::class, 'store'])->name('vehicles.store');
-Route::put('/vehicles/{vehicle}', [VehicleController::class, 'update'])->name('vehicles.update');
-Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy'])->name('vehicles.destroy');
+Route::get('/vehicles', [VehicleController::class, 'index'])
+    ->name('vehicles.index');
+Route::post('/vehicles', [VehicleController::class, 'store'])
+    ->name('vehicles.store');
+Route::put('/vehicles/{vehicle}', [VehicleController::class, 'update'])
+    ->name('vehicles.update');
+Route::delete('/vehicles/{vehicle}', [VehicleController::class, 'destroy'])
+    ->name('vehicles.destroy');
 
-// TRIPTICKET ROUTES
-Route::get('/request-trip-ticket', [TripTicketController::class, 'index'])->name('triptickets.index');
-Route::post('/triptickets', [TripTicketController::class, 'store'])->name('triptickets.store');
-Route::put('/triptickets/{tripticket}', [TripTicketController::class, 'update'])->name('triptickets.update');
-Route::delete('/triptickets/{tripticket}', [TripTicketController::class, 'destroy'])->name('triptickets.destroy');
+// TRIPTICKET ROUTES ('Employee')
+Route::get('/request-trip-ticket', [TripTicketController::class, 'index'])
+    ->name('triptickets.index');
+Route::post('/triptickets', [TripTicketController::class, 'store'])
+    ->name('triptickets.store');
+Route::put('/triptickets/{tripticket}', [TripTicketController::class, 'update'])
+    ->name('triptickets.update');
+Route::delete('/triptickets/{tripticket}', [TripTicketController::class, 'destroy'])
+    ->name('triptickets.destroy');
+
+// TRIPTICKET REVIEW & ASSIGN
+Route::get('/assign-review', [TripTicketController::class, 'assignIndex'])
+    ->name('triptickets.assign.index');
+Route::patch('/assign-review/{tripticket}', [TripTicketController::class, 'assign'])
+    ->name('triptickets.assign');
+
+Route::get('/assigned-trip-tickets', [TripTicketController::class, 'assigned'])
+    ->name('triptickets.assigned');
 
 Route::get('/my-tickets', function () {
     return Inertia::render('Requester/MyTickets');
 });
 
-// * Processor Pages
-Route::get('/incoming-queue', function () {
-    return Inertia::render('Processor/IncomingQueue');
-});
 
-Route::get('/assign-review', function () {
-    return Inertia::render('Processor/AssignReview');
-});
 
 Route::get('/profile', function () {
     return Inertia::render('Account/Profile');

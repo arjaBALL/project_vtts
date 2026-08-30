@@ -23,6 +23,19 @@ class TicketService
         });
     }
 
+    public function update(TripTicket $tripTicket, array $data): TripTicket
+    {
+        $tripTicket->update([
+            'departure_date' => $data['departure_date'],
+            'return_date' => $data['return_date'],
+            'destination' => $data['destination'],
+            'passengers' => $data['passengers'],
+            'purpose' => $data['purpose'],
+        ]);
+
+        return $tripTicket;
+    }
+
     private function generateTicketNo(): string
     {
         return 'TT-' . now()->format('Ymd') . '-' . str_pad(

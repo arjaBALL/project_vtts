@@ -26,6 +26,15 @@ class VehicleService
         });
     }
 
+    public function vehicleOptions()
+    {
+        return Vehicle::query()
+            ->select('id', 'model', 'plate_number', 'capacity')
+            ->where('status', 'active')
+            ->orderBy('model')
+            ->get();
+    }
+
     public function options()
     {
         return Vehicle_type::query()

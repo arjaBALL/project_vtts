@@ -12,22 +12,24 @@ return new class extends Migration {
     {
         Schema::create('trip_tickets', function (Blueprint $table) {
             $table->id();
-
             $table->foreignId('user_id')
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
-
+            $table->foreignId('driver_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+            $table->foreignId('vehicle_id')
+                ->nullable()
+                ->constrained('vehicles')
+                ->nullOnDelete();
             $table->string('trip_ticket_no')->unique();
-
             $table->date('departure_date');
             $table->date('return_date');
-
             $table->string('destination');
             $table->string('purpose');
-
             $table->unsignedInteger('passengers');
-
             $table->enum('status', [
                 'pending',
                 'approved',

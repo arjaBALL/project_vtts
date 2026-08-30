@@ -28,7 +28,7 @@ export const navItems = [
             {
                 label: "Assigned Trips",
                 icon: "route",
-                href: "/incoming-queue",
+                href: "/assigned-trip-tickets",
                 badge: 5,
             },
         ],

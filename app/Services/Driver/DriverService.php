@@ -3,6 +3,7 @@
 namespace App\Services\Driver;
 
 use App\Models\Driver;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class DriverService
@@ -14,7 +15,7 @@ class DriverService
             return Driver::create([
                 'user_id' => $data['user_id'],
                 'license_number' => $data['license_number'],
-                'license_expiry' => $data['license_expiry'] ?? null                
+                'license_expiry' => $data['license_expiry'] ?? null
             ]);
         });
     }
@@ -26,5 +27,19 @@ class DriverService
         ]);
 
         return $driver->fresh();
+    }
+
+    public function options()
+    {
+        return User::query()
+            ->select(
+                'id',
+                'users.first_name',
+                'users.middle_name',
+                'users.last_name'
+            )
+            ->where('role', 'driver')
+            ->orderBy('last_name')
+            ->get();
     }
 }

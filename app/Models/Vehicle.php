@@ -25,4 +25,9 @@ class Vehicle extends Model
         'fuel_consumption',
         'status'
     ];
+
+    public function tripTickets()
+    {
+        return $this->hasMany(TripTicket::class);
+    }
 }

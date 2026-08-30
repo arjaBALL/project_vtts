@@ -4,19 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\Ticket\StoreTicketRequest;
+use App\Http\Requests\Ticket\AssignTripTicketRequest;
 use App\Models\TripTicket;
 use App\Services\Ticket\TicketService;
+use App\Services\Ticket\AssignTripTicketService;
+use App\Services\Driver\DriverService;
+use App\Services\Vehicle\VehicleService;
 use Inertia\Inertia;
 
 class TripTicketController extends Controller
 {
 
     public function __construct(
-        protected TicketService $service
+        protected TicketService $service,
+        protected AssignTripTicketService $assignTripTicketService,
+        protected DriverService $driverService,
+        protected VehicleService $vehicleService
     ) {
 
     }
 
+    // Fetch data for employee created tickets
     public function index(Request $request)
     {
         $search = $request->query('search');
@@ -49,6 +57,105 @@ class TripTicketController extends Controller
 
         return Inertia::render('Requester/RequestTripTickets', [
             'triptickets' => $triptickets,
+            'filters' => [
+                'search' => $search,
+            ],
+        ]);
+    }
+
+    //Fetch data for admin review ticket with status pending
+    public function assignIndex(Request $request)
+    {
+        $search = $request->query('search');
+
+        $triptickets = TripTicket::query()
+            ->select([
+                'id',
+                'user_id',
+                'driver_id',
+                'vehicle_id',
+                'trip_ticket_no',
+                'departure_date',
+                'return_date',
+                'destination',
+                'passengers',
+                'purpose',
+                'status',
+            ])
+            ->with([
+                'driver:id,first_name,middle_name,last_name',
+                'vehicle:id,model,plate_number,capacity',
+            ])
+            ->where('status', 'pending')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('departure_date', 'like', "%{$search}%")
+                        ->orWhere('return_date', 'like', "%{$search}%")
+                        ->orWhere('destination', 'like', "%{$search}%")
+                        ->orWhere('passengers', 'like', "%{$search}%")
+                        ->orWhere('purpose', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('departure_date')
+            ->paginate(10)
+            ->withQueryString();
+
+        $drivers = $this->driverService->options();
+        $vehicles = $this->vehicleService->vehicleOptions();
+
+        return Inertia::render('Processor/AssignReview', [
+            'triptickets' => $triptickets,
+            'drivers' => $drivers,
+            'vehicles' => $vehicles,
+            'filters' => [
+                'search' => $search,
+            ],
+        ]);
+    }
+
+    public function assigned(Request $request)
+    {
+        $search = $request->query('search');
+
+        $triptickets = TripTicket::query()
+            ->select([
+                'id',
+                'user_id',
+                'driver_id',
+                'vehicle_id',
+                'trip_ticket_no',
+                'departure_date',
+                'return_date',
+                'destination',
+                'passengers',
+                'purpose',
+                'status',
+            ])
+            ->with([
+                'driver:id,first_name,middle_name,last_name',
+                'vehicle:id,model,plate_number,capacity',
+            ])
+            ->where('status', 'approved')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('departure_date', 'like', "%{$search}%")
+                        ->orWhere('return_date', 'like', "%{$search}%")
+                        ->orWhere('destination', 'like', "%{$search}%")
+                        ->orWhere('passengers', 'like', "%{$search}%")
+                        ->orWhere('purpose', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('departure_date')
+            ->paginate(10)
+            ->withQueryString();
+
+        $drivers = $this->driverService->options();
+        $vehicles = $this->vehicleService->vehicleOptions();
+
+        return Inertia::render('Processor/IncomingQueue', [
+            'triptickets' => $triptickets,
+            'drivers' => $drivers,
+            'vehicles' => $vehicles,
             'filters' => [
                 'search' => $search,
             ],
@@ -98,20 +205,25 @@ class TripTicketController extends Controller
         StoreTicketRequest $request,
         TripTicket $tripticket
     ) {
-        $validated = $request->validated();
-
-        $tripticket->update([
-            'departure_date' => $validated['departure_date'],
-            'return_date' => $validated['return_date'],
-            'destination' => $validated['destination'],
-            'passengers' => $validated['passengers'],
-            'purpose' => $validated['purpose'],
-            'status' => $validated['status'],
-        ]);
+        $this->service->update($tripticket, $request->validated());
 
         return redirect()
             ->route('triptickets.index')
             ->with('success', 'Trip ticket updated successfully.');
+    }
+
+    public function assign(
+        AssignTripTicketRequest $request,
+        TripTicket $tripticket
+    ) {
+        $this->assignTripTicketService->assign(
+            $tripticket,
+            $request->validated()
+        );
+
+        return redirect()
+            ->route('triptickets.assign.index')
+            ->with('success', 'Driver and vehicle assigned successfully.');
     }
 
     /**
