@@ -30,6 +30,7 @@ class TripTicketController extends Controller
         $search = $request->query('search');
 
         $triptickets = TripTicket::query()
+            ->where('trip_tickets.user_id', auth()->id())
             ->select([
                 'id',
                 'user_id',

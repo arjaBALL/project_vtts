@@ -11,7 +11,7 @@ class TicketService
     {
         return DB::transaction(function () use ($data) {
             return TripTicket::create([
-                'user_id' => 1, // temporary bypass
+                'user_id' => auth()->id(),
                 'trip_ticket_no' => $this->generateTicketNo(),
                 'departure_date' => $data['departure_date'],
                 'return_date' => $data['return_date'],

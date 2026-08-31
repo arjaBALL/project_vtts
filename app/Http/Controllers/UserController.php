@@ -18,7 +18,7 @@ class UserController extends Controller
         protected OfficeService $officeService
     ) {
     }
-    
+
     public function index(Request $request)
     {
         $search = $request->query('search');
@@ -101,4 +101,6 @@ class UserController extends Controller
         $user->delete();
         return redirect()->back()->with('success', 'User deleted.');
     }
+
+
 }

@@ -7,6 +7,8 @@ use Illuminate\Foundation\Auth\User as Authenticable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Office;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticable
 {
@@ -31,5 +33,10 @@ class User extends Authenticable
     protected function casts(): array
     {
         return ['password' => 'hashed'];
+    }
+
+    public function office(): BelongsTo
+    {
+        return $this->belongsTo(Office::class);
     }
 }
