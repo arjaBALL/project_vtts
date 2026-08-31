@@ -2,7 +2,7 @@ import AppLayout from "../../Layouts/AppLayout"; // Go up one level, then into L
 import { PageHeader } from "../../components/ui/PageHeader";
 import Drawer from "../../components/ui/Drawer";
 import { useState } from "react";
-import { Trash2, Pencil, Search, MoreHorizontal, Plus } from "lucide-react";
+import { Trash2, Pencil, Search, CircleX } from "lucide-react";
 import toast from "react-hot-toast";
 import Pagination from "../../components/ui/Pagination";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
@@ -18,7 +18,7 @@ function Field({ label, htmlFor, children }) {
         <div className="mb-4">
             <label
                 htmlFor={htmlFor}
-                className="block text-[13px] font-medium tracking-wide text-slate-600 dark:text-slate-300 mb-1.5"
+                className="block text-[13px] font-medium tracking-wide text-slate-600 mb-1.5"
             >
                 {label}
             </label>
@@ -101,54 +101,54 @@ export default function IncomingQueue({ triptickets, filters }) {
                         <div className="relative flex-1 max-w-xs">
                             <Search
                                 size={16}
-                                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none"
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
                             />
                             <input
                                 type="text"
                                 placeholder="Search by name or office..."
                                 value={query}
                                 onChange={handleSearch}
-                                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+                                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
                             />
                         </div>
 
                         {/* <button
                             type="button"
                             onClick={() => setOpen(true)}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 dark:bg-blue-500 px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 dark:hover:bg-blue-600 active:bg-blue-800 dark:active:bg-blue-700 transition-colors"
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 transition-colors"
                         >
                             <Plus size={16} />
                             Create New Trip Ticket
                         </button> */}
                     </div>
 
-                    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden mt-6">
+                    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden mt-6">
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-center">
-                                <thead className="bg-slate-50 dark:bg-slate-900/40">
+                            <table className="min-w-full divide-y divide-slate-200 text-center">
+                                <thead className="bg-slate-50">
                                     <tr>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
                                             Trip Ticket No.
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
                                             Travel Dates
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
                                             Destination
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
                                             Passengers
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
                                             Purpose
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
                                             Status
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
                                             Driver
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
                                             Vehicle
                                         </th>
                                         <th className="px-5 py-3 text-center">
@@ -158,23 +158,23 @@ export default function IncomingQueue({ triptickets, filters }) {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
+                                <tbody className="divide-y divide-slate-100">
                                     {triptickets?.data?.length > 0 ? (
                                         triptickets.data.map((ticket) => (
                                             <tr
                                                 key={ticket.id}
-                                                className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
+                                                className="hover:bg-slate-50/80 transition-colors"
                                             >
                                                 {/* Trip Ticket Number */}
                                                 <td className="px-5 py-3.5 text-center">
                                                     <div className="flex items-center justify-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
+                                                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center shrink-0">
                                                             {ticket.trip_ticket_no
                                                                 ?.slice(0, 2)
                                                                 .toUpperCase() ??
                                                                 "TT"}
                                                         </div>
-                                                        <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                                                        <span className="text-sm font-medium text-slate-800">
                                                             {
                                                                 ticket.trip_ticket_no
                                                             }
@@ -182,25 +182,25 @@ export default function IncomingQueue({ triptickets, filters }) {
                                                     </div>
                                                 </td>
 
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap text-center">
-                                                    <div className="text-xs text-slate-400 dark:text-slate-500">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 whitespace-nowrap text-center">
+                                                    <div className="text-xs text-slate-400">
                                                         {ticket.departure_date}{" "}
                                                         - {ticket.return_date}
                                                     </div>
                                                 </td>
 
                                                 {/* Destination */}
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap text-center">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 whitespace-nowrap text-center">
                                                     {ticket.destination}
                                                 </td>
 
                                                 {/* Passengers */}
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap text-center">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 whitespace-nowrap text-center">
                                                     {ticket.passengers}
                                                 </td>
 
                                                 {/* Purpose */}
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 text-center">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 text-center">
                                                     {ticket.purpose}
                                                 </td>
 
@@ -210,11 +210,11 @@ export default function IncomingQueue({ triptickets, filters }) {
                                                         className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
                                                             ticket.status ===
                                                             "approved"
-                                                                ? "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400"
+                                                                ? "bg-green-100 text-green-700"
                                                                 : ticket.status ===
                                                                     "rejected"
-                                                                  ? "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400"
-                                                                  : "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400"
+                                                                  ? "bg-red-100 text-red-700"
+                                                                  : "bg-yellow-100 text-yellow-700"
                                                         }`}
                                                     >
                                                         {ticket.status
@@ -229,7 +229,7 @@ export default function IncomingQueue({ triptickets, filters }) {
                                                 </td>
 
                                                 {/* Driver */}
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 text-center">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 text-center">
                                                     {ticket.driver
                                                         ? [
                                                               ticket.driver
@@ -243,10 +243,10 @@ export default function IncomingQueue({ triptickets, filters }) {
                                                 </td>
 
                                                 {/* Vehicle */}
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 text-center">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 text-center">
                                                     {ticket.vehicle ? (
                                                         <div>
-                                                            <div className="font-medium text-slate-700 dark:text-slate-300">
+                                                            <div className="font-medium text-slate-700">
                                                                 {
                                                                     ticket
                                                                         .vehicle
@@ -276,35 +276,21 @@ export default function IncomingQueue({ triptickets, filters }) {
                                                 {/* Actions */}
                                                 <td className="px-5 py-3.5">
                                                     <div className="flex justify-center gap-1.5">
-                                                        {/* Edit */}
                                                         <button
                                                             type="button"
-                                                            className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
-                                                            onClick={() => {
-                                                                setTicketToEdit(
+                                                            aria-label="Reject"
+                                                            title="Reject"
+                                                            onClick={() =>
+                                                                handleReject(
                                                                     ticket,
-                                                                );
-                                                                setData({
-                                                                    trip_ticket_id:
-                                                                        ticket.id,
-                                                                    driver_id:
-                                                                        "",
-                                                                    vehicle_id:
-                                                                        "",
-                                                                });
-                                                                setOpen(true);
-                                                            }}
+                                                                )
+                                                            }
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md border border-red-200 text-red-600 hover:text-red-700 hover:border-red-300 hover:bg-red-50 transition-colors"
                                                         >
-                                                            <Pencil size={15} />
-                                                        </button>
-
-                                                        {/* Delete */}
-                                                        <button
-                                                            type="button"
-                                                            className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                                                            aria-label="Delete"
-                                                        >
-                                                            <Trash2 size={15} />
+                                                            <CircleX
+                                                                size={13}
+                                                            />
+                                                            Cancel
                                                         </button>
                                                     </div>
                                                 </td>
@@ -316,10 +302,10 @@ export default function IncomingQueue({ triptickets, filters }) {
                                                 colSpan={10}
                                                 className="px-5 py-12 text-center"
                                             >
-                                                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                                                <p className="text-sm font-medium text-slate-600">
                                                     No results found
                                                 </p>
-                                                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                                                <p className="text-xs text-slate-400 mt-1">
                                                     Try a different search, or
                                                     add a new item.
                                                 </p>

@@ -23,6 +23,10 @@ Route::get('/dashboard', function () {
     return Inertia::render('Main/Dashboard');
 });
 
+Route::get('/login', function () {
+    return Inertia::render('Auth/Login');
+});
+
 // USER ROUTES
 
 // Route::middleware(['auth'])->group(function () {

@@ -14,15 +14,15 @@ import {
 } from "../../components/ui/Inputs";
 
 const STATUS_STYLES = {
-    active: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/30",
+    active: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20",
     under_maintenance:
-        "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/30",
+        "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20",
     inactive:
-        "bg-slate-100 text-slate-500 ring-1 ring-inset ring-slate-500/15 dark:bg-slate-500/10 dark:text-slate-400 dark:ring-slate-500/20",
+        "bg-slate-100 text-slate-500 ring-1 ring-inset ring-slate-500/15",
     disposed:
-        "bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/30",
+        "bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20",
     retired:
-        "bg-slate-100 text-slate-500 ring-1 ring-inset ring-slate-500/15 dark:bg-slate-700/40 dark:text-slate-400 dark:ring-slate-600/30",
+        "bg-slate-100 text-slate-500 ring-1 ring-inset ring-slate-500/15",
 };
 
 const STATUS_LABELS = {
@@ -50,7 +50,7 @@ function Field({ label, htmlFor, children }) {
         <div className="mb-4">
             <label
                 htmlFor={htmlFor}
-                className="block text-[13px] font-medium tracking-wide text-slate-600 dark:text-slate-300 mb-1.5"
+                className="block text-[13px] font-medium tracking-wide text-slate-600 mb-1.5"
             >
                 {label}
             </label>
@@ -232,7 +232,7 @@ export default function Vehicles({
                     </div>
                     <button
                         onClick={() => setOpen(true)}
-                        className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm shadow-blue-600/20 w-fit shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm shadow-blue-600/20 w-fit shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2"
                     >
                         <CarFront size={17} />
                         <span>New Vehicle</span>
@@ -244,57 +244,57 @@ export default function Vehicles({
                     <div className="relative flex-1 max-w-xs">
                         <Search
                             size={16}
-                            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none"
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
                         />
                         <input
                             value={query}
                             onChange={handleSearch}
                             type="text"
                             placeholder="Search by plate or office..."
-                            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+                            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
                         />
                     </div>
-                    <p className="text-xs text-slate-400 dark:text-slate-500 ml-auto hidden sm:block">
+                    <p className="text-xs text-slate-400 ml-auto hidden sm:block">
                         Showing {vehicles.from ?? 0}–{vehicles.to ?? 0} of{" "}
                         {vehicles.total ?? 0} vehicles
                     </p>
                 </div>
 
                 {/* Table */}
-                <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+                <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="min-w-full table-fixed divide-y divide-slate-200 dark:divide-slate-700 text-center">
-                            <thead className="bg-slate-50 dark:bg-slate-900/40">
+                        <table className="min-w-full table-fixed divide-y divide-slate-200 text-center">
+                            <thead className="bg-slate-50">
                                 <tr>
-                                    <th className="w-8 px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"></th>
-                                    <th className="w-20 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-8 px-3 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500"></th>
+                                    <th className="w-20 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                                         Plate No.
                                     </th>
-                                    <th className="w-28 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-28 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                                         Office
                                     </th>
-                                    <th className="w-28 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-28 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                                         Vehicle Type
                                     </th>
-                                    <th className="w-36 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-36 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                                         Model
                                     </th>
-                                    <th className="w-20 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-20 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                                         Year
                                     </th>
-                                    <th className="w-16 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-16 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                                         Capacity
                                     </th>
-                                    <th className="w-24 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-24 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                                         Fuel Type
                                     </th>
-                                    <th className="w-32 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-32 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                                         Fleet Card No.
                                     </th>
-                                    <th className="w-28 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-28 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                                         Fuel Consumption
                                     </th>
-                                    <th className="w-28 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th className="w-28 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                                         Status
                                     </th>
                                     <th className="w-24 px-4 py-3 text-center">
@@ -303,55 +303,55 @@ export default function Vehicles({
                                 </tr>
                             </thead>
 
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
+                            <tbody className="divide-y divide-slate-100">
                                 {vehicles.data.map((vehicle) => (
                                     <tr
                                         key={vehicle.id}
-                                        className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
+                                        className="hover:bg-slate-50/80 transition-colors"
                                     >
                                         <td className="px-3 py-3 text-center">
                                             <div className="flex items-center justify-center">
-                                                <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                                <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
                                                     <CarFront size={15} />
                                                 </div>
                                             </div>
                                         </td>
 
                                         <td className="px-4 py-3 text-center">
-                                            <span className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate block">
+                                            <span className="text-sm font-medium text-slate-800 truncate block">
                                                 {vehicle.plate_number}
                                             </span>
                                         </td>
 
-                                        <td className="px-4 py-3 text-center text-sm text-slate-600 dark:text-slate-400 truncate">
+                                        <td className="px-4 py-3 text-center text-sm text-slate-600 truncate">
                                             {vehicle.abbreviation}
                                         </td>
 
-                                        <td className="px-4 py-3 text-center text-sm text-slate-600 dark:text-slate-400 truncate">
+                                        <td className="px-4 py-3 text-center text-sm text-slate-600 truncate">
                                             {vehicle.vehicle_type}
                                         </td>
 
-                                        <td className="px-4 py-3 text-center text-sm text-slate-600 dark:text-slate-400 truncate">
+                                        <td className="px-4 py-3 text-center text-sm text-slate-600 truncate">
                                             {vehicle.model}
                                         </td>
 
-                                        <td className="px-4 py-3 text-center text-sm text-slate-600 dark:text-slate-400">
+                                        <td className="px-4 py-3 text-center text-sm text-slate-600">
                                             {vehicle.year_model}
                                         </td>
 
-                                        <td className="px-4 py-3 text-center text-sm text-slate-600 dark:text-slate-400">
+                                        <td className="px-4 py-3 text-center text-sm text-slate-600">
                                             {vehicle.capacity}
                                         </td>
 
-                                        <td className="px-4 py-3 text-center text-sm text-slate-600 dark:text-slate-400 truncate">
+                                        <td className="px-4 py-3 text-center text-sm text-slate-600 truncate">
                                             {vehicle.fuel_type}
                                         </td>
 
-                                        <td className="px-4 py-3 text-center text-sm text-slate-600 dark:text-slate-400 truncate">
+                                        <td className="px-4 py-3 text-center text-sm text-slate-600 truncate">
                                             {vehicle.fleet_card_number}
                                         </td>
 
-                                        <td className="px-4 py-3 text-center text-sm text-slate-600 dark:text-slate-400">
+                                        <td className="px-4 py-3 text-center text-sm text-slate-600">
                                             {vehicle.fuel_consumption}
                                         </td>
 
@@ -369,7 +369,7 @@ export default function Vehicles({
                                                     onClick={() =>
                                                         handleEdit(vehicle)
                                                     }
-                                                    className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
+                                                    className="p-1.5 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                                                     aria-label={`Edit ${vehicle.id}`}
                                                 >
                                                     <Pencil size={15} />
@@ -379,7 +379,7 @@ export default function Vehicles({
                                                     onClick={() =>
                                                         handleDelete(vehicle)
                                                     }
-                                                    className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                                    className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                                                     aria-label={`Delete ${vehicle.plate_number} ${vehicle.model}`}
                                                 >
                                                     <Trash2 size={15} />
@@ -395,10 +395,10 @@ export default function Vehicles({
                                             colSpan={12}
                                             className="px-5 py-12 text-center"
                                         >
-                                            <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                                            <p className="text-sm font-medium text-slate-600">
                                                 No vehicles found
                                             </p>
-                                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                                            <p className="text-xs text-slate-400 mt-1">
                                                 Try a different search, or add a
                                                 new vehicle.
                                             </p>
@@ -425,7 +425,7 @@ export default function Vehicles({
                 footer={
                     <div className="flex justify-end gap-2">
                         <button
-                            className="px-4 py-2 text-sm font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                            className="px-4 py-2 text-sm font-medium border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors"
                             onClick={() => setOpen(false)}
                         >
                             Cancel
@@ -445,7 +445,7 @@ export default function Vehicles({
                     </div>
                 }
             >
-                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">
+                <p className="text-sm font-semibold text-slate-800 mb-4">
                     Vehicle info
                 </p>
                 <Field label="Plate No. / License Plate" htmlFor="plate_no">
@@ -521,7 +521,7 @@ export default function Vehicles({
                     )}
                 </Field>
 
-                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">
+                <p className="text-sm font-semibold text-slate-800 mb-4">
                     Capacity & usage
                 </p>
                 <Field label="Capacity" htmlFor="capacity">
@@ -617,7 +617,7 @@ export default function Vehicles({
                     )}
                 </Field>
 
-                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">
+                <p className="text-sm font-semibold text-slate-800 mb-4">
                     Status & maintenance
                 </p>
                 <Field label="Vehicle Status" htmlFor="status">
