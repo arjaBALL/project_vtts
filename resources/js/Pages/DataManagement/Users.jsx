@@ -25,9 +25,9 @@ import {
 } from "../../components/ui/Inputs";
 
 const STATUS_STYLES = {
-    active: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20",
+    active: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/30",
     inactive:
-        "bg-slate-100 text-slate-500 ring-1 ring-inset ring-slate-500/15",
+        "bg-slate-100 text-slate-500 ring-1 ring-inset ring-slate-500/15 dark:bg-slate-500/10 dark:text-slate-400 dark:ring-slate-500/20",
 };
 
 function initials(name) {
@@ -58,7 +58,7 @@ function Field({ label, htmlFor, children }) {
         <div className="mb-4">
             <label
                 htmlFor={htmlFor}
-                className="block text-[13px] font-medium tracking-wide text-slate-600 mb-1.5"
+                className="block text-[13px] font-medium tracking-wide text-slate-600 dark:text-slate-300 mb-1.5"
             >
                 {label}
             </label>
@@ -249,7 +249,7 @@ export default function Users({ users, offices, filters }) {
                     </div>
                     <button
                         onClick={() => setOpen(true)}
-                        className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm shadow-blue-600/20 w-fit shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2"
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm shadow-blue-600/20 w-fit shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
                     >
                         <UserPlus2 size={17} />
                         <span>New User</span>
@@ -261,48 +261,48 @@ export default function Users({ users, offices, filters }) {
                     <div className="relative flex-1 max-w-xs">
                         <Search
                             size={16}
-                            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none"
                         />
                         <input
                             value={query}
                             onChange={handleSearch}
                             type="text"
                             placeholder="Search by name or role..."
-                            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+                            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
                         />
                     </div>
-                    <p className="text-xs text-slate-400 ml-auto hidden sm:block">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 ml-auto hidden sm:block">
                         Showing {users.from ?? 0}–{users.to ?? 0} of{" "}
                         {users.total ?? 0} users
                     </p>
                 </div>
 
                 {/* Table */}
-                <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="min-w-full table-fixed divide-y divide-slate-200 text-center">
-                            <thead className="bg-slate-50">
+                        <table className="min-w-full table-fixed divide-y divide-slate-200 dark:divide-slate-700 text-center">
+                            <thead className="bg-slate-50 dark:bg-slate-900/40">
                                 <tr>
                                     <th className="w-10 px-4 py-3 align-middle">
                                         <input
                                             type="checkbox"
-                                            className="rounded border-slate-300 ..."
+                                            className="rounded border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:focus:ring-offset-slate-800"
                                         />
                                     </th>
                                     <th className="w-12 px-2 py-3 align-middle"></th>
-                                    <th className="w-32 px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 align-middle">
+                                    <th className="w-32 px-3 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Username
                                     </th>
-                                    <th className="w-48 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 align-middle">
+                                    <th className="w-48 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Name
                                     </th>
-                                    <th className="w-24 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 align-middle">
+                                    <th className="w-24 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Office
                                     </th>
-                                    <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 align-middle">
+                                    <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Role
                                     </th>
-                                    <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 align-middle">
+                                    <th className="w-28 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 align-middle">
                                         Status
                                     </th>
                                     <th className="w-32 px-5 py-3 align-middle">
@@ -311,30 +311,30 @@ export default function Users({ users, offices, filters }) {
                                 </tr>
                             </thead>
 
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
                                 {users.data.map((user) => (
                                     <tr
                                         key={user.id}
-                                        className="hover:bg-slate-50/80 transition-colors"
+                                        className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
                                     >
                                         <td className="px-4 py-3.5 align-middle text-center">
                                             <input
                                                 type="checkbox"
-                                                className="rounded border-slate-300 ..."
+                                                className="rounded border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:focus:ring-offset-slate-800"
                                             />
                                         </td>
                                         <td className="px-2 py-3.5 align-middle">
-                                            <div className="w-8 h-8 mx-auto rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center shrink-0">
+                                            <div className="w-8 h-8 mx-auto rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-xs font-semibold flex items-center justify-center shrink-0">
                                                 {initials(
                                                     `${user.first_name} ${user.middle_name ?? ""} ${user.last_name}`,
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-3 py-3.5 text-sm text-slate-600 truncate align-middle text-center">
+                                        <td className="px-3 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle text-center">
                                             {user.username}
                                         </td>
                                         <td className="px-5 py-3.5 align-middle text-center">
-                                            <p className="text-sm font-medium text-slate-800 truncate text-center">
+                                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate text-center">
                                                 {user.first_name}{" "}
                                                 {user.middle_name
                                                     ? `${user.middle_name} `
@@ -342,10 +342,10 @@ export default function Users({ users, offices, filters }) {
                                                 {user.last_name}
                                             </p>
                                         </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 truncate align-middle text-center">
+                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle text-center">
                                             {user.abbreviation}
                                         </td>
-                                        <td className="px-5 py-3.5 text-sm text-slate-600 truncate align-middle text-center">
+                                        <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 truncate align-middle text-center">
                                             {user.role}
                                         </td>
                                         <td className="px-5 py-3.5 align-middle text-center">
@@ -357,7 +357,7 @@ export default function Users({ users, offices, filters }) {
                                                     onClick={() =>
                                                         handleEdit(user)
                                                     }
-                                                    className="p-1.5 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                                    className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
                                                     aria-label={`Edit ${user.id}`}
                                                 >
                                                     <Pencil size={15} />
@@ -366,7 +366,7 @@ export default function Users({ users, offices, filters }) {
                                                     onClick={() =>
                                                         handleDelete(user)
                                                     }
-                                                    className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                    className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                                                     aria-label={`Delete ${user.first_name} ${user.last_name}`}
                                                 >
                                                     <Trash2 size={15} />
@@ -374,7 +374,7 @@ export default function Users({ users, offices, filters }) {
                                                 <Popover>
                                                     <PopoverTrigger asChild>
                                                         <button
-                                                            className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                                                            className="p-1.5 rounded-md text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors"
                                                             aria-label={`More actions for ${user.id}`}
                                                         >
                                                             <MoreHorizontal
@@ -385,10 +385,10 @@ export default function Users({ users, offices, filters }) {
 
                                                     <PopoverContent
                                                         align="end"
-                                                        className="w-40 p-1"
+                                                        className="w-40 p-1 dark:bg-slate-800 dark:border-slate-700"
                                                     >
                                                         <button
-                                                            className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100"
+                                                            className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200"
                                                             onClick={() =>
                                                                 handleEdit(user)
                                                             }
@@ -396,7 +396,7 @@ export default function Users({ users, offices, filters }) {
                                                             Edit
                                                         </button>
                                                         <button
-                                                            className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100"
+                                                            className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-200"
                                                             onClick={() =>
                                                                 handleView(user)
                                                             }
@@ -404,7 +404,7 @@ export default function Users({ users, offices, filters }) {
                                                             View
                                                         </button>
                                                         <button
-                                                            className="w-full rounded-md px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                                                            className="w-full rounded-md px-3 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
                                                             onClick={() =>
                                                                 handleDelete(
                                                                     user,
@@ -426,10 +426,10 @@ export default function Users({ users, offices, filters }) {
                                             colSpan={8}
                                             className="px-5 py-12 text-center"
                                         >
-                                            <p className="text-sm font-medium text-slate-600">
+                                            <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
                                                 No users found
                                             </p>
-                                            <p className="text-xs text-slate-400 mt-1">
+                                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                                                 Try a different search, or add a
                                                 new user.
                                             </p>
@@ -461,7 +461,7 @@ export default function Users({ users, offices, filters }) {
                 footer={
                     <div className="flex justify-end gap-2">
                         <button
-                            className="px-4 py-2 text-sm font-medium border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors"
+                            className="px-4 py-2 text-sm font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                             onClick={() => setOpen(false)}
                         >
                             Cancel
@@ -481,7 +481,7 @@ export default function Users({ users, offices, filters }) {
                     </div>
                 }
             >
-                <p className="text-sm font-semibold text-slate-800 mb-4">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">
                     Details
                 </p>
 

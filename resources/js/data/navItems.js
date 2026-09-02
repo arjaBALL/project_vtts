@@ -55,6 +55,11 @@ export const navItems = [
                         icon: "carFront",
                         href: "/vehicles",
                     },
+                    {
+                        label: "Manage User Access",
+                        icon: "permissions",
+                        href: "/manage-user-access",
+                    },
                 ],
             },
         ],

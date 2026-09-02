@@ -74,4 +74,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', function () {
         return Inertia::render('Account/Profile');
     });
+
+ Route::get('/manage-user-access', function () {
+    return Inertia::render('DataManagement/ManageUserAccess');
+});
 });

@@ -131,7 +131,7 @@ export default function AssignReview({
                                 placeholder="Search by name or office..."
                                 value={query}
                                 onChange={handleSearch}
-                                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+                                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
                             />
                         </div>
 
@@ -145,27 +145,27 @@ export default function AssignReview({
                         </button> */}
                     </div>
 
-                    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden mt-6">
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden mt-6">
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-slate-200 text-center">
-                                <thead className="bg-slate-50">
+                            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-center">
+                                <thead className="bg-slate-50 dark:bg-slate-900/40">
                                     <tr>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
                                             Travel Dates
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
                                             Requestor
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
                                             Destination
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
                                             Passengers
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
                                             Purpose
                                         </th>
-                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap text-center">
+                                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
                                             Status
                                         </th>
                                         <th className="px-5 py-3 text-center">
@@ -175,32 +175,32 @@ export default function AssignReview({
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100">
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
                                     {triptickets?.data?.length > 0 ? (
                                         triptickets.data.map((ticket) => (
                                             <tr
                                                 key={ticket.id}
-                                                className="hover:bg-slate-50/80 transition-colors"
+                                                className="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
                                             >
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 whitespace-nowrap text-center">
-                                                    <div className="text-xs text-slate-400">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap text-center">
+                                                    <div className="text-xs text-slate-400 dark:text-slate-500">
                                                         {ticket.departure_date}{" "}
                                                         - {ticket.return_date}
                                                     </div>
                                                 </td>
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 whitespace-nowrap text-center">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap text-center">
                                                     Employee Name
                                                 </td>
                                                 {/* Destination */}
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 whitespace-nowrap text-center">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap text-center">
                                                     {ticket.destination}
                                                 </td>
                                                 {/* Passengers */}
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 whitespace-nowrap text-center">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap text-center">
                                                     {ticket.passengers}
                                                 </td>
                                                 {/* Purpose */}
-                                                <td className="px-5 py-3.5 text-sm text-slate-600 text-center">
+                                                <td className="px-5 py-3.5 text-sm text-slate-600 dark:text-slate-400 text-center">
                                                     {ticket.purpose}
                                                 </td>
                                                 {/* Status */}
@@ -209,11 +209,11 @@ export default function AssignReview({
                                                         className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
                                                             ticket.status ===
                                                             "approved"
-                                                                ? "bg-green-100 text-green-700"
+                                                                ? "bg-green-100 dark:bg-green-500/15 text-green-700 dark:text-green-400"
                                                                 : ticket.status ===
                                                                     "rejected"
-                                                                  ? "bg-red-100 text-red-700"
-                                                                  : "bg-yellow-100 text-yellow-700"
+                                                                  ? "bg-red-100 dark:bg-red-500/15 text-red-700 dark:text-red-400"
+                                                                  : "bg-yellow-100 dark:bg-yellow-500/15 text-yellow-700 dark:text-yellow-400"
                                                         }`}
                                                     >
                                                         {ticket.status
@@ -234,7 +234,7 @@ export default function AssignReview({
                                                             type="button"
                                                             aria-label="Approve"
                                                             title="Approve"
-                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md border border-green-200 text-green-600 hover:text-green-700 hover:border-green-300 hover:bg-green-50 transition-colors"
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md border border-green-200 dark:border-green-500/30 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:border-green-300 dark:hover:border-green-500/50 hover:bg-green-50 dark:hover:bg-green-500/10 transition-colors"
                                                             onClick={() => {
                                                                 setTicketToEdit(
                                                                     ticket,
@@ -268,7 +268,7 @@ export default function AssignReview({
                                                                     ticket,
                                                                 )
                                                             }
-                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md border border-red-200 text-red-600 hover:text-red-700 hover:border-red-300 hover:bg-red-50 transition-colors"
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:border-red-300 dark:hover:border-red-500/50 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                                                         >
                                                             <ThumbsDown
                                                                 size={13}
@@ -285,10 +285,10 @@ export default function AssignReview({
                                                 colSpan={7}
                                                 className="px-5 py-12 text-center"
                                             >
-                                                <p className="text-sm font-medium text-slate-600">
+                                                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
                                                     No results found
                                                 </p>
-                                                <p className="text-xs text-slate-400 mt-1">
+                                                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                                                     Try a different search, or
                                                     add a new item.
                                                 </p>
@@ -305,7 +305,7 @@ export default function AssignReview({
             <Drawer
                 open={open}
                 onClose={() => setOpen(false)}
-                title={ticketToEdit ? "Edit Ticket" : "Add New Ticket"}
+                title={ticketToEdit ? "Update Ticket" : "Add New Ticket"}
                 subtitle={
                     ticketToEdit
                         ? "Update the ticket's information below."
@@ -334,7 +334,7 @@ export default function AssignReview({
                     </div>
                 }
             >
-                <p className="text-sm font-semibold text-slate-800 mb-4">
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">
                     Ticket info
                 </p>
 

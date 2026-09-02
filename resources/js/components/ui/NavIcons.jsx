@@ -9,6 +9,7 @@ import {
     CarFront,
     CircleUserRound,
     LogOut,
+    ShieldCheck,
 } from "lucide-react";
 
 export default function NavIcon({ name, size = 18, strokeWidth = 1.8 }) {
@@ -23,6 +24,7 @@ export default function NavIcon({ name, size = 18, strokeWidth = 1.8 }) {
         carFront: CarFront,
         userCircle2Icon: CircleUserRound,
         logout: LogOut,
+        permissions: ShieldCheck,
     };
 
     const Icon = icons[name];
