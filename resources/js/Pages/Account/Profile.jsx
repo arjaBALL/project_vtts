@@ -1,4 +1,5 @@
 import AppLayout from "../../Layouts/AppLayout"; // Go up one level, then into Layouts
+import { router, usePage } from "@inertiajs/react";
 import {
     Trash2,
     Pencil,
@@ -14,6 +15,18 @@ import {
 } from "lucide-react";
 
 export default function Profile() {
+    const { props, url } = usePage();
+    const { auth = {} } = props;
+    const user = auth.user ?? null;
+
+    const fullName = [user?.first_name, user?.middle_name, user?.last_name]
+        .filter(Boolean)
+        .join(" ");
+
+    const initials = [user?.first_name?.[0], user?.last_name?.[0]]
+        .filter(Boolean)
+        .join("")
+        .toUpperCase();
     return (
         <AppLayout>
             <div className="p-6 h-full">
@@ -22,17 +35,18 @@ export default function Profile() {
                     <div className="col-span-2 row-span-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl p-6 flex flex-col ">
                         <div className="flex items-center gap-3">
                             <div className="w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 text-2xl font-semibold flex items-center justify-center shrink-0">
-                                AB
+                                {initials || "U"}
                             </div>
 
                             <div className="flex w-full items-center justify-between">
                                 <div>
                                     <p className="text-lg font-bold dark:text-slate-300">
-                                        John Arjay Dacuyan
+                                        {fullName}
                                     </p>
 
                                     <p className="text-sm font-medium">
-                                        Admin · RFIMC
+                                        {user?.role} ·{" "}
+                                        {user?.office_abbreviation}
                                     </p>
                                 </div>
 

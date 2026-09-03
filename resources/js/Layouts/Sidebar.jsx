@@ -6,7 +6,18 @@ import { navItems } from "../data/navItems";
 import NavIcon from "../components/ui/NavIcons";
 
 export default function Sidebar({ mobileOpen, onClose }) {
-    const { url } = usePage();
+    const { props, url } = usePage();
+    const { auth = {} } = props;
+    const user = auth.user ?? null;
+
+    const fullName = [user?.first_name, user?.middle_name, user?.last_name]
+        .filter(Boolean)
+        .join(" ");
+
+    const initials = [user?.first_name?.[0], user?.last_name?.[0]]
+        .filter(Boolean)
+        .join("")
+        .toUpperCase();
 
     const currentPath = useMemo(() => url?.split("?")[0] ?? "", [url]);
 
@@ -610,7 +621,7 @@ export default function Sidebar({ mobileOpen, onClose }) {
                                     shadow-md shadow-teal-500/20
                                 "
                             >
-                                JD
+                                {initials || "U"}
                             </div>
 
                             <span
@@ -628,12 +639,13 @@ export default function Sidebar({ mobileOpen, onClose }) {
                             <>
                                 <div className="min-w-0 flex-1">
                                     <p className="truncate text-[13px] font-semibold text-slate-800 dark:text-slate-200">
-                                        Juan Dela Cruz
+                                        {fullName}
                                     </p>
 
                                     <p className="flex items-center gap-1 text-[10.5px] font-medium text-slate-400 dark:text-slate-500">
                                         <span className="h-1 w-1 rounded-full bg-emerald-400" />
-                                        Requester
+                                        {user?.role} ·{" "}
+                                        {user?.office_abbreviation}
                                     </p>
                                 </div>
 
@@ -655,6 +667,7 @@ export default function Sidebar({ mobileOpen, onClose }) {
                                     <button
                                         type="button"
                                         aria-label="Log out"
+                                        onClick={() => router.post("/logout")}
                                         className="
                                             rounded-lg p-2
                                             text-slate-400 dark:text-slate-500

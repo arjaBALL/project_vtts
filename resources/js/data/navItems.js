@@ -28,7 +28,7 @@ export const navItems = [
             {
                 label: "Assigned Trips",
                 icon: "route",
-                href: "/incoming-queue",
+                href: "/assigned-trip-tickets",
                 badge: 5,
             },
         ],
@@ -54,6 +54,11 @@ export const navItems = [
                         label: "Vehicles",
                         icon: "carFront",
                         href: "/vehicles",
+                    },
+                    {
+                        label: "Manage User Access",
+                        icon: "permissions",
+                        href: "/manage-user-access",
                     },
                 ],
             },
