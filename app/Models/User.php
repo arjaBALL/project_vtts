@@ -39,4 +39,9 @@ class User extends Authenticable
     {
         return $this->belongsTo(Office::class);
     }
+
+    public function driver()
+{
+    return $this->hasOne(Driver::class, 'user_id');
+}
 }

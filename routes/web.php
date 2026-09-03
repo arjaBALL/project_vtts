@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
     // TRIPTICKET REVIEW & ASSIGN
     Route::get('/assign-review', [TripTicketController::class, 'assignIndex'])->name('triptickets.assign.index');
     Route::patch('/assign-review/{tripticket}', [TripTicketController::class, 'assign'])->name('triptickets.assign');
+    Route::patch('/assign-review/{tripticket}', [TripTicketController::class, 'reject'])->name('triptickets.reject');
 
     Route::get('/assigned-trip-tickets', [TripTicketController::class, 'assigned'])->name('triptickets.assigned');
 

@@ -20,5 +20,16 @@ class AssignTripTicketService
         });
     }
 
+    public function reject(TripTicket $tripticket, array $data): TripTicket
+    {
+        return DB::transaction(function () use ($tripticket, $data) {
+            $tripticket->update([
+                'status' => 'rejected',
+            ]);
+
+            return $tripticket->fresh();
+        });
+    }
+
 
 }

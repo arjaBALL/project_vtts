@@ -109,6 +109,23 @@ export default function AssignReview({
         });
     };
 
+    const handleReject = (ticket) => {
+        router.patch(
+            `/assign-review/${ticket.id}`,
+            {
+                status: "rejected",
+            },
+            {
+                onSuccess: () => {
+                    toast.success("Trip ticket rejected successfully.");
+                },
+                onError: () => {
+                    toast.error("Something went wrong. Please try again.");
+                },
+            },
+        );
+    };
+
     return (
         <AppLayout>
             <div className="min-h-full">

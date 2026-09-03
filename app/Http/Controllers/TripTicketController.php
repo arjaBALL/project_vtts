@@ -114,6 +114,7 @@ class TripTicketController extends Controller
         ]);
     }
 
+    
     public function assigned(Request $request)
     {
         $search = $request->query('search');
@@ -199,9 +200,7 @@ class TripTicketController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+   // UPDATE & Assign Driver and Vehicle to Trip Ticket 
     public function update(
         StoreTicketRequest $request,
         TripTicket $tripticket
@@ -226,6 +225,15 @@ class TripTicketController extends Controller
             ->route('triptickets.assign.index')
             ->with('success', 'Driver and vehicle assigned successfully.');
     }
+
+    public function reject( AssignTripTicketRequest $request, TripTicket $tripticket)
+        {
+            $this->assignTripTicketService->reject($tripticket, $request->validated());
+
+            return redirect()
+                ->route('triptickets.assign.index')
+                ->with('success', 'Trip ticket rejected successfully.');
+        }
 
     /**
      * Remove the specified resource from storage.
