@@ -1,5 +1,8 @@
 import AppLayout from "../../Layouts/AppLayout";
 import { PageHeader } from "../../components/ui/PageHeader";
+import Drawer from "../../components/ui/Drawer";
+import { useState } from "react";
+import { useForm, router } from "@inertiajs/react";
 import {
     ShieldCheck,
     Users,
@@ -7,7 +10,6 @@ import {
     FlaskConical,
     Search,
 } from "lucide-react";
-import { useState } from "react";
 import {
     TextInput,
     SelectInput,
@@ -57,12 +59,6 @@ const tabs = [
     },
 ];
 
-/* ------------------------------------------------------------------ */
-/* Role Matrix — data-driven                                          */
-/* ------------------------------------------------------------------ */
-
-// One place to define roles, badge colors, and each module's permissions.
-// Add/remove a role or module here — the table markup never changes.
 const ROLE_BADGE_CLASSES = {
     Admin: "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300",
     Staff: "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400",
@@ -202,6 +198,21 @@ const INITIAL_ROLES = [
                 delete: false,
             },
         ],
+    },
+];
+
+const updates = [
+    {
+        user: "John Doe",
+        module: "User Management",
+        update: "Updated role",
+        reason: "Promotion",
+    },
+    {
+        user: "Jane Smith",
+        module: "Reports",
+        update: "Changed permissions",
+        reason: "Access requirement",
     },
 ];
 
@@ -350,102 +361,174 @@ function RoleMatrix() {
 /* ------------------------------------------------------------------ */
 
 function UserAssignments() {
+    const users = [
+        {
+            id: 1,
+            initials: "JD",
+            name: "Juan Dela Cruz",
+            email: "juan.delacruz@example.com",
+            role: "",
+            avatarClass:
+                "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400",
+        },
+        {
+            id: 2,
+            initials: "MS",
+            name: "Maria Santos",
+            email: "maria.santos@example.com",
+            role: "",
+            avatarClass:
+                "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
+        },
+    ];
+
     return (
-        <div className="rounded-lg ">
-            <div className="flex items-center justify-between gap-4 flex-wrap my-4">
-                <div className="relative flex-1 max-w-xs">
+        <div className="space-y-5">
+            {/* Header */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                            User Assignments
+                        </h2>
+
+                        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                            {users.length} users
+                        </span>
+                    </div>
+
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Assign roles and manage user access permissions.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                >
+                    Save changes
+                </button>
+            </div>
+
+            {/* Toolbar */}
+            <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
+                <div className="relative w-full sm:max-w-sm">
                     <Search
                         size={16}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                     />
+
                     <input
                         type="text"
-                        placeholder="Search by name or office..."
-                        className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400"
+                        placeholder="Search users..."
+                        className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-500 dark:focus:bg-slate-800"
                     />
+                </div>
+
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    Active assignments
                 </div>
             </div>
 
-            {/* Your role matrix table goes here */}
-            <div className="overflow-hidden rounded-xl border border-slate-200 shadow-sm dark:border-slate-700">
-                <table className="min-w-full table-fixed divide-y divide-slate-200 text-center dark:divide-slate-700">
-                    <thead className="bg-slate-50 dark:bg-slate-900/40">
-                        <tr>
-                            {["User", "Assigned Role"].map((heading) => (
-                                <th
-                                    key={heading}
-                                    className="whitespace-nowrap px-5 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
-                                >
-                                    {heading}
+            {/* Table */}
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                        <thead className="bg-slate-50 dark:bg-slate-800/60">
+                            <tr>
+                                <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    User
                                 </th>
+
+                                <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    Assigned role
+                                </th>
+
+                                <th className="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    Status
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
+                            {users.map((user) => (
+                                <tr
+                                    key={user.id}
+                                    className="transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
+                                >
+                                    {/* User */}
+                                    <td className="whitespace-nowrap px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <span
+                                                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${user.avatarClass}`}
+                                            >
+                                                {user.initials}
+                                            </span>
+
+                                            <div>
+                                                <p className="text-sm font-medium text-slate-800 dark:text-slate-100">
+                                                    {user.name}
+                                                </p>
+
+                                                <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+                                                    {user.email}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    {/* Role */}
+                                    <td className="px-6 py-4">
+                                        <div className="w-[220px]">
+                                            <SelectInput
+                                                id={`role-${user.id}`}
+                                                name={`role-${user.id}`}
+                                                placeholder="Select role"
+                                                className="w-full"
+                                            >
+                                                <option value="">
+                                                    Select role
+                                                </option>
+                                                <option value="admin">
+                                                    Admin
+                                                </option>
+                                                <option value="staff">
+                                                    Staff
+                                                </option>
+                                                <option value="user">
+                                                    User
+                                                </option>
+                                                <option value="driver">
+                                                    Driver
+                                                </option>
+                                            </SelectInput>
+                                        </div>
+                                    </td>
+
+                                    {/* Status */}
+                                    <td className="whitespace-nowrap px-6 py-4 text-right">
+                                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+                                            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                                            Unassigned
+                                        </span>
+                                    </td>
+                                </tr>
                             ))}
-                        </tr>
-                    </thead>
+                        </tbody>
+                    </table>
+                </div>
 
-                    <tbody className="divide-y divide-slate-100 bg-white dark:divide-slate-700/60 dark:bg-slate-900">
-                        {/* Sample UI Row */}
-                        <tr className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60">
-                            <td className="whitespace-nowrap px-5 py-4">
-                                <div className="flex items-center justify-center gap-2.5">
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
-                                        JD
-                                    </span>
-                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                        Juan Dela Cruz
-                                    </span>
-                                </div>
-                            </td>
+                {/* Footer */}
+                <div className="flex flex-col gap-2 border-t border-slate-200 bg-slate-50/50 px-6 py-3.5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700 dark:bg-slate-800/30">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Showing {users.length} of {users.length} users
+                    </p>
 
-                            <td className="whitespace-nowrap ">
-                                <div className="flex justify-center">
-                                    <SelectInput
-                                        id="role-1"
-                                        name="role"
-                                        placeholder="Select role"
-                                        className="w-40"
-                                    >
-                                        <option value="">Select role</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="staff">Staff</option>
-                                        <option value="user">User</option>
-                                        <option value="driver">Driver</option>
-                                    </SelectInput>
-                                </div>
-                            </td>
-                        </tr>
-
-                        {/* Second Sample Row */}
-                        <tr className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60">
-                            <td className="whitespace-nowrap px-5 py-4">
-                                <div className="flex items-center justify-center gap-2.5">
-                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                                        MS
-                                    </span>
-                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                        Maria Santos
-                                    </span>
-                                </div>
-                            </td>
-
-                            <td className="whitespace-nowrap m">
-                                <div className="flex justify-center">
-                                    <SelectInput
-                                        id="role-2"
-                                        name="role"
-                                        placeholder="Select role"
-                                        className="w-40"
-                                    >
-                                        <option value="">Select role</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="staff">Staff</option>
-                                        <option value="user">User</option>
-                                        <option value="driver">Driver</option>
-                                    </SelectInput>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
+                        Changes are saved when you click Save changes.
+                    </p>
+                </div>
             </div>
         </div>
     );
@@ -453,13 +536,104 @@ function UserAssignments() {
 
 function Overrides() {
     return (
-        <div className="rounded-lg border border-default p-6">
-            <h2 className="text-lg font-semibold text-heading">Overrides</h2>
-            <p className="mt-1 text-sm text-subtle">
-                Manage permission exceptions outside the role matrix.
-            </p>
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            {/* Header */}
+            <div className="flex flex-col gap-3 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700">
+                <div>
+                    <h2 className="text-lg font-semibold text-heading">
+                        Overrides
+                    </h2>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Manage access to modules and available actions.
+                    </p>
+                </div>
 
-            {/* Your overrides table goes here */}
+                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    Changes are saved automatically
+                </div>
+            </div>
+
+            <table className="min-w-full table-fixed text-left">
+                <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50/80 dark:border-slate-700 dark:bg-slate-800/50">
+                        {["User", "Module", "Update", "Reason", ""].map(
+                            (heading) => (
+                                <th
+                                    key={heading}
+                                    className={`whitespace-nowrap px-6 py-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 ${
+                                        heading === "User"
+                                            ? "w-72 border-r border-slate-200 dark:border-slate-700"
+                                            : ""
+                                    } ${
+                                        heading === "Reason"
+                                            ? "min-w-55"
+                                            : "text-center"
+                                    }`}
+                                >
+                                    {heading}
+                                </th>
+                            ),
+                        )}
+                    </tr>
+                </thead>
+
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                    {updates.map((item, index) => (
+                        <tr
+                            key={item.id ?? index}
+                            className="group transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                        >
+                            {/* User */}
+                            <td className="w-72 border-r border-slate-200 px-6 py-4 dark:border-slate-700">
+                                <div className="truncate font-medium text-slate-900 dark:text-white">
+                                    {item.user}
+                                </div>
+                            </td>
+
+                            {/* Module */}
+                            <td className="w-48 px-6 py-4 text-center text-sm text-slate-600 dark:text-slate-400">
+                                <span className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 dark:bg-slate-700 dark:text-slate-300">
+                                    {item.module}
+                                </span>
+                            </td>
+
+                            {/* Update */}
+                            <td className="w-56 px-6 py-4 text-center text-sm font-medium text-slate-700 dark:text-slate-300">
+                                {item.update}
+                            </td>
+
+                            {/* Reason */}
+                            <td className="min-w-55 px-6 py-4 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                                {item.reason}
+                            </td>
+
+                            <td className="w-32 px-6 py-4 text-center">
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemove(item.id)}
+                                    className="inline-flex items-center rounded-md border border-red-200 px-3 py-1 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-300 dark:focus:ring-offset-slate-900"
+                                >
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4 dark:border-slate-700">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Review permissions carefully before making changes.
+                </p>
+
+                <button
+                    type="button"
+                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                >
+                    Save Changes
+                </button>
+            </div>
         </div>
     );
 }
@@ -479,8 +653,28 @@ function AccessSimulator() {
     );
 }
 
-export default function ManageUserAccess() {
+export default function ManageUserAccess({ filters }) {
     const [active, setActive] = useState(tabs[0].name);
+    const [open, setOpen] = useState(false);
+    const [query, setQuery] = useState(filters?.search ?? "");
+    const [ticketToEdit, setTicketToEdit] = useState(null);
+
+    const {
+        data,
+        post,
+        setData,
+        processing,
+        errors,
+        setError,
+        put,
+        patch,
+        clearErrors,
+        reset,
+    } = useForm({
+        driver_id: "",
+        vehicle_id: "",
+        status: "approve",
+    });
 
     return (
         <AppLayout>
@@ -580,6 +774,41 @@ export default function ManageUserAccess() {
                     {active === "Access simulator" && <AccessSimulator />}
                 </div>
             </div>
+
+            <Drawer
+                open={open}
+                onClose={() => setOpen(false)}
+                title={ticketToEdit ? "Update Ticket" : "Add New Ticket"}
+                subtitle={
+                    ticketToEdit
+                        ? "Update the ticket's information below."
+                        : "Fill in the details of the new ticket below."
+                }
+                footer={
+                    <div className="flex justify-end gap-2">
+                        <button
+                            className="px-4 py-2 text-sm font-medium border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors"
+                            onClick={() => setOpen(false)}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20 disabled:opacity-50"
+                        >
+                            {processing
+                                ? "Saving..."
+                                : ticketToEdit
+                                  ? "Update"
+                                  : "Save"}
+                        </button>
+                    </div>
+                }
+            >
+                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">
+                    Ticket info
+                </p>
+            </Drawer>
         </AppLayout>
     );
 }

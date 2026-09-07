@@ -330,83 +330,32 @@ export default function AssignReview({
                 }
                 footer={
                     <div className="flex justify-end gap-2">
+                        {" "}
                         <button
-                            className="px-4 py-2 text-sm font-medium border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors"
+                            type="button"
+                            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                             onClick={() => setOpen(false)}
                         >
-                            Cancel
-                        </button>
+                            {" "}
+                            Cancel{" "}
+                        </button>{" "}
                         <button
                             type="button"
                             onClick={handleSubmit}
                             disabled={processing}
-                            className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20 disabled:opacity-50"
+                            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-blue-600/20 transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                         >
+                            {" "}
                             {processing
                                 ? "Saving..."
                                 : ticketToEdit
                                   ? "Update"
-                                  : "Save"}
-                        </button>
+                                  : "Save"}{" "}
+                        </button>{" "}
                     </div>
                 }
             >
-                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">
-                    Ticket info
-                </p>
-
-                <Field label="Driver" htmlFor="driver">
-                    <SelectInput
-                        id="driver_id"
-                        name="driver_id"
-                        placeholder="Select type"
-                        value={data.driver_id}
-                        onChange={(e) => setData("driver_id", e.target.value)}
-                    >
-                        <option value="">Select driver</option>
-
-                        {drivers.map((driver) => (
-                            <option key={driver.id} value={driver.id}>
-                                {[
-                                    driver.first_name,
-                                    driver.middle_name,
-                                    driver.last_name,
-                                ]
-                                    .filter(Boolean)
-                                    .join(" ")}
-                            </option>
-                        ))}
-                    </SelectInput>
-                    {errors.driver_id && (
-                        <p className="mt-1 text-xs text-red-500">
-                            {errors.driver_id}
-                        </p>
-                    )}
-                </Field>
-
-                <Field label="Vehicle" htmlFor="vehicle_id">
-                    <SelectInput
-                        id="vehicle_id"
-                        name="vehicle_id"
-                        value={data.vehicle_id}
-                        onChange={(e) => setData("vehicle_id", e.target.value)}
-                    >
-                        <option value="">Select vehicle</option>
-
-                        {vehicles.map((vehicle) => (
-                            <option key={vehicle.id} value={vehicle.id}>
-                                Plate No. {vehicle.plate_number} -{" "}
-                                {vehicle.model} - Capacity: {vehicle.capacity}
-                            </option>
-                        ))}
-                    </SelectInput>
-
-                    {errors.vehicle_id && (
-                        <p className="mt-1 text-xs text-red-500">
-                            {errors.vehicle_id}
-                        </p>
-                    )}
-                </Field>
+                {" "}
             </Drawer>
         </AppLayout>
     );
