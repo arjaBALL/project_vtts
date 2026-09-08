@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserPermission;
+use App\Services\User\UserService;
+use App\Services\User\UserPermissionService;
 use Illuminate\Http\Request;
 
 class UserPermissionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct(protected UserPermissionService $service)
+    {
+    }
     public function index()
     {
         //
@@ -52,7 +54,27 @@ class UserPermissionController extends Controller
      */
     public function update(Request $request, UserPermission $userPermission)
     {
-        //
+        $validated = $request->validated();
+
+
+    }
+
+    public function saveMatrix(Request $request)
+    {
+        $validated = $request->validate([
+            'roles' => 'required|array',
+            'roles.*.name' => 'required|string',
+            'roles.*.modules' => 'required|array',
+            'roles.*.modules.*.name' => 'required|string',
+            'roles.*.modules.*.view' => 'boolean',
+            'roles.*.modules.*.add' => 'boolean',
+            'roles.*.modules.*.update' => 'boolean',
+            'roles.*.modules.*.delete' => 'boolean',
+        ]);
+
+        $this->service->saveMatrix($validated['roles']);
+
+        return back()->with('success', 'Role permissions updated.');
     }
 
     /**

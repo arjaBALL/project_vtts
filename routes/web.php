@@ -7,6 +7,7 @@ use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\TripTicketController;
+use App\Http\Controllers\UserPermissionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 /*
@@ -68,6 +69,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/assigned-trip-tickets', [TripTicketController::class, 'assigned'])->name('triptickets.assigned');
 
+    // ROLE ACCESS PERMISSION
+    Route::put('/role-permissions/matrix', [UserPermissionController::class, 'saveMatrix'])
+        ->name('role-permissions.save-matrix');
+
     Route::get('/my-tickets', function () {
         return Inertia::render('Requester/MyTickets');
     });
@@ -76,7 +81,7 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Account/Profile');
     });
 
- Route::get('/manage-user-access', function () {
-    return Inertia::render('DataManagement/ManageUserAccess');
-});
+    Route::get('/manage-user-access', function () {
+        return Inertia::render('DataManagement/ManageUserAccess');
+    });
 });

@@ -2,6 +2,7 @@ import AppLayout from "../../Layouts/AppLayout";
 import { PageHeader } from "../../components/ui/PageHeader";
 import Drawer from "../../components/ui/Drawer";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { useForm, router } from "@inertiajs/react";
 import {
     ShieldCheck,
@@ -220,6 +221,7 @@ const PERMISSION_KEYS = ["view", "add", "update", "delete"];
 
 function RoleMatrix() {
     const [roles, setRoles] = useState(INITIAL_ROLES);
+    const [saving, setSaving] = useState(false);
 
     const togglePermission = (roleIdx, moduleIdx, key) => {
         setRoles((prev) =>
@@ -235,6 +237,24 @@ function RoleMatrix() {
                           ),
                       },
             ),
+        );
+    };
+
+    const handleSave = () => {
+        setSaving(true);
+        router.put(
+            "/role-permissions/matrix",
+            { roles },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success("Role permissions updated successfully");
+                },
+                onError: () => {
+                    toast.error("Failed to update role permissions");
+                },
+                onFinish: () => setSaving(false),
+            },
         );
     };
 
@@ -349,9 +369,11 @@ function RoleMatrix() {
 
                 <button
                     type="button"
-                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:opacity-50"
                 >
-                    Save Changes
+                    {saving ? "Saving..." : "Save Changes"}
                 </button>
             </div>
         </div>
@@ -675,6 +697,10 @@ export default function ManageUserAccess({ filters }) {
         vehicle_id: "",
         status: "approve",
     });
+
+    const handleSaveRoleAccess = (e) => {
+        e.preventDefault();
+    };
 
     return (
         <AppLayout>

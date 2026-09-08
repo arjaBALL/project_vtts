@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -22,7 +21,6 @@ return new class extends Migration
             $table->foreignId('module_id')
                 ->constrained('modules')
                 ->cascadeOnDelete();
-
             $table->boolean('can_view')->default(false);
             $table->boolean('can_add')->default(false);
             $table->boolean('can_update')->default(false);
@@ -36,11 +34,8 @@ return new class extends Migration
 
 
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('user_permissions');
+        Schema::dropIfExists('permissions'); // was 'user_permissions'
     }
 };
