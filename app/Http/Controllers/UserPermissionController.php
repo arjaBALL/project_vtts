@@ -4,17 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Models\UserPermission;
 use App\Services\User\UserService;
+use App\Models\Role;
 use App\Services\User\UserPermissionService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class UserPermissionController extends Controller
 {
     public function __construct(protected UserPermissionService $service)
     {
     }
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $roles = Role::with('permissions.module')
+            ->get()
+            ->map(function ($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+
+                    'modules' => $role->permissions
+                        ->map(function ($permission) {
+                            return [
+                                'id' => $permission->module_id,
+                                'name' => $permission->module->name,
+
+                                'view' => (bool) $permission->can_view,
+                                'add' => (bool) $permission->can_add,
+                                'update' => (bool) $permission->can_update,
+                                'delete' => (bool) $permission->can_delete,
+                            ];
+                        })
+                        ->values(),
+                ];
+            });
+
+        return Inertia::render('DataManagement/ManageUserAccess', [
+            'roles' => $roles,
+            'filters' => $request->only('search'),
+        ]);
     }
 
     /**

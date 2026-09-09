@@ -70,6 +70,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/assigned-trip-tickets', [TripTicketController::class, 'assigned'])->name('triptickets.assigned');
 
     // ROLE ACCESS PERMISSION
+    Route::get('/manage-user-access', [UserPermissionController::class, 'index'])
+        ->name('manage-user-access.index');
     Route::put('/role-permissions/matrix', [UserPermissionController::class, 'saveMatrix'])
         ->name('role-permissions.save-matrix');
 
@@ -81,7 +83,5 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Account/Profile');
     });
 
-    Route::get('/manage-user-access', function () {
-        return Inertia::render('DataManagement/ManageUserAccess');
-    });
+
 });

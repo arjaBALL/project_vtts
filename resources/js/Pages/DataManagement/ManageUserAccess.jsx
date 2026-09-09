@@ -1,7 +1,7 @@
 import AppLayout from "../../Layouts/AppLayout";
 import { PageHeader } from "../../components/ui/PageHeader";
 import Drawer from "../../components/ui/Drawer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useForm, router } from "@inertiajs/react";
 import {
@@ -219,9 +219,13 @@ const updates = [
 
 const PERMISSION_KEYS = ["view", "add", "update", "delete"];
 
-function RoleMatrix() {
-    const [roles, setRoles] = useState(INITIAL_ROLES);
+function RoleMatrix({ initialRoles }) {
+    const [roles, setRoles] = useState(initialRoles ?? []);
     const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+        setRoles(initialRoles ?? []);
+    }, [initialRoles]);
 
     const togglePermission = (roleIdx, moduleIdx, key) => {
         setRoles((prev) =>
@@ -254,6 +258,24 @@ function RoleMatrix() {
                     toast.error("Failed to update role permissions");
                 },
                 onFinish: () => setSaving(false),
+            },
+        );
+    };
+
+    const handlsearch = (e) => {
+        const value = e.target.value;
+
+        setQuery(value);
+
+        router.get(
+            "role-permissions",
+            {
+                search: value,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
             },
         );
     };
@@ -675,7 +697,7 @@ function AccessSimulator() {
     );
 }
 
-export default function ManageUserAccess({ filters }) {
+export default function ManageUserAccess({ roles, filters }) {
     const [active, setActive] = useState(tabs[0].name);
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState(filters?.search ?? "");
@@ -791,7 +813,9 @@ export default function ManageUserAccess({ filters }) {
 
                 {/* Tab panels */}
                 <div className="mt-2">
-                    {active === "Role matrix" && <RoleMatrix />}
+                    {active === "Role matrix" && (
+                        <RoleMatrix initialRoles={roles} />
+                    )}
 
                     {active === "User assignments" && <UserAssignments />}
 
